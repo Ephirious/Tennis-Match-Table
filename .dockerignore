@@ -1,0 +1,5 @@
+.env
+.env.example
+../currency-exchanger/docker-compose.yml
+.dockerignore
+Dockerfile
