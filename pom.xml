@@ -80,6 +80,26 @@
             <version>2.22.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.14.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.14.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>xyz.block</groupId>
+            <artifactId>uuidv7</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>
