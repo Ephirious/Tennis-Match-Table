@@ -1,6 +1,6 @@
 package com.ephirious.model.entity;
 
-import com.ephirious.model.values.PlayerName;
+import com.ephirious.model.value.PlayerName;
 import lombok.Getter;
 import xyz.block.uuidv7.UUIDv7;
 

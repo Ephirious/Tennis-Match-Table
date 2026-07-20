@@ -1,4 +1,4 @@
-package com.ephirious.model.values;
+package com.ephirious.model.value;
 
 
 import com.ephirious.util.validator.AbstractValidator;
