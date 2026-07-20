@@ -8,6 +8,11 @@ public class MatchScore {
     private final int secondSetPoints;
     private final SetScore currentSet;
 
+    public MatchScore() {
+        firstSetPoints = secondSetPoints = 0;
+        currentSet = new SetScore();
+    }
+
     public MatchScore pointTo(PlayerSide side) {
         if (hasWinner()) {
             throw new IllegalStateException("Winner already exists");

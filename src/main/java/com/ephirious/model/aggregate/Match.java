@@ -17,7 +17,7 @@ public class Match {
         this.id = UUIDv7.generate();
         this.firstPlayerId = firstPlayerId;
         this.secondPlayerId = secondPlayerId;
-        this.score = new MatchScore(0, 0, new SetScore());
+        this.score = new MatchScore();
     }
 
     public void pointTo(PlayerSide side) {
