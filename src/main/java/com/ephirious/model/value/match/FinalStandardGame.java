@@ -15,6 +15,9 @@ public class FinalStandardGame implements Game {
 
     @Override
     public PlayerSide winner() {
+        if (!hasWinner()) {
+            throw new IllegalStateException("The game's winner didn't define");
+        }
         return state == WIN_FIRST ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
 
