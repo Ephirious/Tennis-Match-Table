@@ -22,7 +22,7 @@ public class FinalStandardGame implements Game {
     }
 
     @Override
-    public Game pointTo(PlayerSide side) {
+    public FinalStandardGame pointTo(PlayerSide side) {
         if (hasWinner()) {
             throw new IllegalStateException("The game's winner already exists");
         }
@@ -36,5 +36,17 @@ public class FinalStandardGame implements Game {
             case FinalGameState st when st == DEUCE && side == PlayerSide.SECOND -> new FinalStandardGame(AD_SECOND);
             default -> throw new IllegalStateException();
         };
+    }
+
+    public boolean isDeuce() {
+        return state == DEUCE;
+    }
+
+    public boolean isAdvantageFirst() {
+        return state == AD_FIRST;
+    }
+
+    public boolean isAdvantageSecond() {
+        return state == AD_SECOND;
     }
 }

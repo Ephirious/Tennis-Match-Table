@@ -29,7 +29,7 @@ public class TieBreakGame implements Game {
     }
 
     @Override
-    public Game pointTo(PlayerSide side) {
+    public TieBreakGame pointTo(PlayerSide side) {
         if (hasWinner()) {
             throw new IllegalStateException("The game's winner already exists");
         }
