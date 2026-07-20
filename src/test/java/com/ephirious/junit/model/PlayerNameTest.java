@@ -1,6 +1,6 @@
 package com.ephirious.junit.model;
 
-import com.ephirious.model.values.PlayerName;
+import com.ephirious.model.value.PlayerName;
 import com.ephirious.util.validator.AbstractValidator;
 import com.ephirious.util.validator.NameValidator;
 import org.junit.jupiter.api.BeforeAll;
