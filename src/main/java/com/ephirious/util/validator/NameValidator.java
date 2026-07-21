@@ -1,11 +1,11 @@
 package com.ephirious.util.validator;
 
+import com.ephirious.model.value.PlayerName;
+
 import java.util.List;
 import java.util.function.IntPredicate;
 
 public final class NameValidator extends AbstractValidator<IntPredicate, String> {
-    public static final int MAX_NAME_LENGTH = 64;
-
     private static final List<ValidationRule<IntPredicate>> RULES = List.of(
             new ValidationRule<>(Character::isWhitespace, "The name must not contain whitespaces"),
             new ValidationRule<>(Character::isDigit, "The name must not contain digits"),
@@ -21,7 +21,7 @@ public final class NameValidator extends AbstractValidator<IntPredicate, String>
             throw new IllegalArgumentException("The name must not be null or empty");
         }
 
-        if (name.length() > MAX_NAME_LENGTH) {
+        if (name.length() > PlayerName.MAX_LENGTH) {
             throw new IllegalArgumentException("The name must contain no more than 64 characters");
         }
 

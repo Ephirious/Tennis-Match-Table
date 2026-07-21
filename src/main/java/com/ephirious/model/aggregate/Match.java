@@ -2,7 +2,6 @@ package com.ephirious.model.aggregate;
 
 import com.ephirious.model.value.match.MatchScore;
 import com.ephirious.model.value.match.PlayerSide;
-import com.ephirious.model.value.match.SetScore;
 import xyz.block.uuidv7.UUIDv7;
 
 import java.util.UUID;
@@ -21,6 +20,9 @@ public class Match {
     }
 
     public void pointTo(PlayerSide side) {
+        if (matchEnded()) {
+            throw new IllegalStateException("The match has already ended");
+        }
         score = score.pointTo(side);
     }
 
@@ -40,5 +42,17 @@ public class Match {
 
     public MatchScore score() {
         return score;
+    }
+
+    public UUID id() {
+        return id;
+    }
+
+    public UUID firstPlayerId() {
+        return firstPlayerId;
+    }
+
+    public UUID secondPlayerId() {
+        return secondPlayerId;
     }
 }
