@@ -37,4 +37,8 @@ public class Match {
         }
         return secondPlayerId;
     }
+
+    public MatchScore score() {
+        return score;
+    }
 }

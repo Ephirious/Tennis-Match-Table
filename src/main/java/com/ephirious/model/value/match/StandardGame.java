@@ -37,6 +37,16 @@ public class StandardGame implements Game {
         return new StandardGame(first, second.next());
     }
 
+    @Override
+    public String firstPlayerPoints() {
+        return first.value();
+    }
+
+    @Override
+    public String secondPlayerPoints() {
+        return second.value();
+    }
+
     private boolean isFirstWin(PlayerSide side) {
         return side == PlayerSide.FIRST && first == StandardPointState.FORTY;
     }

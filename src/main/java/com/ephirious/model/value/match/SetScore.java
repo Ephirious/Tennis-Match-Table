@@ -46,6 +46,18 @@ public class SetScore {
         return firstGamePoints > secondGamePoints ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
 
+    public Game currentGame() {
+        return currentGame;
+    }
+
+    public int firstPlayerGamePoints() {
+        return firstGamePoints;
+    }
+
+    public int secondPlayerGamePoints() {
+        return secondGamePoints;
+    }
+
     private boolean isGeneralWin() {
         return (firstGamePoints == SCORE_TO_WIN && secondGamePoints < SCORE_OF_DRAW) ||
                (secondGamePoints == SCORE_TO_WIN && firstGamePoints < SCORE_OF_DRAW);

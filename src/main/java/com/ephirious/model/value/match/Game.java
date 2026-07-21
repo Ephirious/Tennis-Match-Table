@@ -4,4 +4,6 @@ public interface Game {
     boolean hasWinner();
     PlayerSide winner();
     Game pointTo(PlayerSide side);
+    String firstPlayerPoints();
+    String secondPlayerPoints();
 }

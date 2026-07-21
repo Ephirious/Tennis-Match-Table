@@ -37,4 +37,16 @@ public class MatchScore {
         }
         return firstSetPoints == 2 ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
+
+    public int firstPlayerSetPoint() {
+        return firstSetPoints;
+    }
+
+    public int secondPlayerSetPoint() {
+        return secondSetPoints;
+    }
+
+    public SetScore currentSet() {
+        return currentSet;
+    }
 }

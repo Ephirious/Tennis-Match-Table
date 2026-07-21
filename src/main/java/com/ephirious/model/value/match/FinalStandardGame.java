@@ -38,6 +38,24 @@ public class FinalStandardGame implements Game {
         };
     }
 
+    @Override
+    public String firstPlayerPoints() {
+        return switch (state) {
+            case AD_FIRST -> "AD";
+            case AD_SECOND, DEUCE -> "40";
+            case WIN_FIRST, WIN_SECOND -> "0";
+        };
+    }
+
+    @Override
+    public String secondPlayerPoints() {
+        return switch (state) {
+            case AD_SECOND -> "AD";
+            case AD_FIRST, DEUCE -> "40";
+            case WIN_FIRST, WIN_SECOND -> "0";
+        };
+    }
+
     public boolean isDeuce() {
         return state == DEUCE;
     }

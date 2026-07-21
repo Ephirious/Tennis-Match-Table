@@ -39,6 +39,16 @@ public class TieBreakGame implements Game {
         return new TieBreakGame(firstPoints, secondPoints + 1);
     }
 
+    @Override
+    public String firstPlayerPoints() {
+        return String.valueOf(firstPoints);
+    }
+
+    @Override
+    public String secondPlayerPoints() {
+        return String.valueOf(secondPoints);
+    }
+
     private boolean isWin() {
         return Math.max(firstPoints, secondPoints) >= WIN_SCORE &&
                Math.abs(firstPoints - secondPoints) >= DIFFERENCE_TO_WIN;
