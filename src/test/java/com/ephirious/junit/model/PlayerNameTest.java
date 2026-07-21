@@ -82,14 +82,14 @@ class PlayerNameTest {
 
     private static Stream<String> validNameLength() {
         return Stream.of(
-                "t".repeat(NameValidator.MAX_NAME_LENGTH - 1),
-                "t".repeat(NameValidator.MAX_NAME_LENGTH)
+                "t".repeat(PlayerName.MAX_LENGTH - 1),
+                "t".repeat(PlayerName.MAX_LENGTH)
         );
     }
 
     private static Stream<String> invalidNameLength() {
         return Stream.of(
-                "t".repeat(NameValidator.MAX_NAME_LENGTH + 1)
+                "t".repeat(PlayerName.MAX_LENGTH + 1)
         );
     }
 }

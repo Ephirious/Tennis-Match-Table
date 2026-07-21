@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./sql:/docker-entrypoint-initdb.d
+      - ./src/main/resources/db:/docker-entrypoint-initdb.d
     ports:
       - 127.0.0.1:${EXTERNAL_DATABASE_PORT}:5432
     healthcheck:

@@ -1,6 +1,6 @@
 create table players (
     id uuid primary key default uuidv7(),
-    name varchar(64) not null ,
+    name varchar(32) not null ,
 
     constraint unique_name unique (name)
 );
