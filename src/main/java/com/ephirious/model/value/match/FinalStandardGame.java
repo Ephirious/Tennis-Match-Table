@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import static com.ephirious.model.value.match.FinalGameState.*;
 
 @RequiredArgsConstructor
-public class FinalStandardGame implements Game {
+public class FinalStandardGame implements GameScore {
     private final FinalGameState state;
 
     @Override

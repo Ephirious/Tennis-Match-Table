@@ -10,7 +10,7 @@ public class SetScore {
 
     private final int firstGamePoints;
     private final int secondGamePoints;
-    private final Game currentGame;
+    private final GameScore currentGame;
 
     public SetScore() {
         firstGamePoints = secondGamePoints = 0;
@@ -22,7 +22,7 @@ public class SetScore {
             throw new IllegalStateException("Winner already exists");
         }
 
-        Game newGame = currentGame.pointTo(side);
+        GameScore newGame = currentGame.pointTo(side);
         if (newGame.hasWinner()) {
             int newFirst = newGame.winner() == PlayerSide.FIRST ? firstGamePoints + 1 : firstGamePoints;
             int newSecond = newGame.winner() == PlayerSide.SECOND ? secondGamePoints + 1 : secondGamePoints;
@@ -46,7 +46,7 @@ public class SetScore {
         return firstGamePoints > secondGamePoints ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
 
-    public Game currentGame() {
+    public GameScore currentGame() {
         return currentGame;
     }
 

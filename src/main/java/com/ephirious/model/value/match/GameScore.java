@@ -1,9 +1,9 @@
 package com.ephirious.model.value.match;
 
-public interface Game {
+public interface GameScore {
     boolean hasWinner();
     PlayerSide winner();
-    Game pointTo(PlayerSide side);
+    GameScore pointTo(PlayerSide side);
     String firstPlayerPoints();
     String secondPlayerPoints();
 }

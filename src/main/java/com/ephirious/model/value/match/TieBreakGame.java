@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class TieBreakGame implements Game {
+public class TieBreakGame implements GameScore {
     private static final int DIFFERENCE_TO_WIN = 2;
     private static final int WIN_SCORE = 7;
 

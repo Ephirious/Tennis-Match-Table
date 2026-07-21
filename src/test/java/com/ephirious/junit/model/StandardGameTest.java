@@ -1,9 +1,8 @@
 package com.ephirious.junit.model;
 
-import com.ephirious.model.value.match.Game;
+import com.ephirious.model.value.match.GameScore;
 import com.ephirious.model.value.match.PlayerSide;
 import com.ephirious.model.value.match.StandardGame;
-import com.ephirious.model.value.match.TieBreakGame;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,7 +27,7 @@ class StandardGameTest {
     @ParameterizedTest
     @MethodSource("providePointEventsToUnfinishedGame")
     void shouldThrowWhenWinnerNotDefine(List<PlayerSide> pointEvents) {
-        Game newGame = game;
+        GameScore newGame = game;
         for (var side : pointEvents) {
             newGame = newGame.pointTo(side);
         }
@@ -41,7 +40,7 @@ class StandardGameTest {
     @ParameterizedTest
     @MethodSource("providePointEventsToWinnerFirst")
     void shouldWinnerFirst(List<PlayerSide> pointEvents) {
-        Game newGame = game;
+        GameScore newGame = game;
         for (var side : pointEvents) {
             newGame = newGame.pointTo(side);
         }
@@ -51,7 +50,7 @@ class StandardGameTest {
     @ParameterizedTest
     @MethodSource("providePointEventsToWinnerSecond")
     void shouldWinnerSecond(List<PlayerSide> pointEvents) {
-        Game newGame = game;
+        GameScore newGame = game;
         for (var side : pointEvents) {
             newGame = newGame.pointTo(side);
         }

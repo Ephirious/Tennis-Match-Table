@@ -3,7 +3,7 @@ package com.ephirious.model.value.match;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class StandardGame implements Game {
+public class StandardGame implements GameScore {
     private final StandardPointState first;
     private final StandardPointState second;
 
@@ -22,7 +22,7 @@ public class StandardGame implements Game {
     }
 
     @Override
-    public Game pointTo(PlayerSide side) {
+    public GameScore pointTo(PlayerSide side) {
         if (isFirstWin(side)) {
             return new FinalStandardGame(FinalGameState.WIN_FIRST);
         } else if (isSecondWin(side)) {
