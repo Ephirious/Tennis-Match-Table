@@ -10,6 +10,7 @@ import java.util.function.IntPredicate;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PlayerName {
+    public static final int MIN_LENGTH = 3;
     public static final int MAX_LENGTH = 32;
 
     private final String name;

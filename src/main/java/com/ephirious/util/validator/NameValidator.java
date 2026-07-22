@@ -21,8 +21,9 @@ public final class NameValidator extends AbstractValidator<IntPredicate, String>
             throw new IllegalArgumentException("The name must not be null or empty");
         }
 
-        if (name.length() > PlayerName.MAX_LENGTH) {
-            throw new IllegalArgumentException("The name must contain no more than 64 characters");
+        if (name.length() > PlayerName.MAX_LENGTH || name.length() < PlayerName.MIN_LENGTH) {
+            throw new IllegalArgumentException("The name must contain between %d and %d characters"
+                    .formatted(PlayerName.MIN_LENGTH, PlayerName.MAX_LENGTH));
         }
 
         RULES.stream()
