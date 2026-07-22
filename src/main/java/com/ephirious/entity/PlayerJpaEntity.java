@@ -1,18 +1,14 @@
 package com.ephirious.entity;
 
 import com.ephirious.model.value.PlayerName;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -35,4 +31,19 @@ public class PlayerJpaEntity {
         this.name = name;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        PlayerJpaEntity entity = (PlayerJpaEntity) obj;
+
+        return this.id.equals(entity.id) &&
+               Objects.equals(name, entity.name);
+    }
 }

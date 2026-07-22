@@ -4,6 +4,7 @@ import com.ephirious.model.value.match.MatchScore;
 import com.ephirious.model.value.match.PlayerSide;
 import xyz.block.uuidv7.UUIDv7;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Match {
@@ -13,6 +14,9 @@ public class Match {
     private MatchScore score;
 
     public Match(UUID firstPlayerId, UUID secondPlayerId) {
+        ensureNotNullUuid(firstPlayerId, secondPlayerId);
+        ensureNotSameUuid(firstPlayerId, secondPlayerId);
+
         this.id = UUIDv7.generate();
         this.firstPlayerId = firstPlayerId;
         this.secondPlayerId = secondPlayerId;
@@ -54,5 +58,17 @@ public class Match {
 
     public UUID secondPlayerId() {
         return secondPlayerId;
+    }
+
+    private void ensureNotNullUuid(UUID first, UUID second) {
+        if (first == null || second == null) {
+            throw new IllegalStateException("The two player ids must be not null");
+        }
+    }
+
+    private void ensureNotSameUuid(UUID firstPlayerId, UUID secondPlayerId) {
+        if (Objects.equals(firstPlayerId, secondPlayerId)) {
+            throw new IllegalStateException("The match can't create, because first player's id equal second player's id");
+        }
     }
 }

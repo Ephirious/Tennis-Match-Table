@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -41,6 +42,10 @@ public class MatchJpaEntity {
     private PlayerJpaEntity winner;
 
     public MatchJpaEntity(PlayerJpaEntity first, PlayerJpaEntity second, PlayerJpaEntity winner) {
+        if (Objects.equals(first, second)) {
+            throw new IllegalStateException("The match entity can't create, because first player equal second player");
+        }
+
         this.firstPlayer = first;
         this.secondPlayer = second;
         this.winner = winner;
