@@ -28,13 +28,13 @@ public class PlayerJpaEntity {
 
 
     public PlayerJpaEntity(UUID id, String name) {
-        ensureId();
+        ensureId(id);
         this.id = id;
         this.name = name;
     }
 
     public PlayerJpaEntity(UUID id) {
-        ensureId();
+        ensureId(id);
         this.id = id;
     }
 
@@ -54,7 +54,7 @@ public class PlayerJpaEntity {
                Objects.equals(name, entity.name);
     }
 
-    private void ensureId() {
+    private void ensureId(UUID id) {
         if (id == null) {
             throw new IllegalStateException("PlayerJpaEntity requires not null id");
         }
