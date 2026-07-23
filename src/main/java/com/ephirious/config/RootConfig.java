@@ -1,12 +1,21 @@
 package com.ephirious.config;
 
 
+import com.ephirious.entity.MatchJpaEntity;
+import com.ephirious.entity.PlayerJpaEntity;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+
 import static com.ephirious.util.EnvironmentVariableConfig.getEnvVariableOrThrow;
 
 @org.springframework.context.annotation.Configuration
+@ComponentScan(basePackages = {
+        "com.ephirious.repository",
+        "com.ephirious.mapper",
+        "com.ephirious.service"}
+)
 public class RootConfig {
     private static final String DB_PROTOCOL = getEnvVariableOrThrow("DATABASE_PROTOCOL");
     private static final String DB_SERVER = getEnvVariableOrThrow("DATABASE_SERVER");
@@ -27,7 +36,9 @@ public class RootConfig {
         configureDatabase(configuration);
         configureConnectionPool(configuration);
 
-        configuration.addPackage("com.ephirious.model.entity");
+        configuration.addAnnotatedClass(PlayerJpaEntity.class);
+        configuration.addAnnotatedClass(MatchJpaEntity.class);
+
 
         return configuration.buildSessionFactory();
     }
