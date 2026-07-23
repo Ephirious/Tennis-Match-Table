@@ -20,7 +20,6 @@ class PlayerNameTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "Te st",
             "T e s t"
     })
     void shouldForbidWhitespacesInMiddle(String name) {

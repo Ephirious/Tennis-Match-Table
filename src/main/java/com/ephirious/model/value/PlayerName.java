@@ -17,7 +17,7 @@ public class PlayerName {
 
     public static PlayerName of(String name) {
         ensureName(name);
-        return new PlayerName(name);
+        return new PlayerName(name.trim());
     }
 
     public String value() {
@@ -26,6 +26,8 @@ public class PlayerName {
 
     private static void ensureName(String name) {
         ensureNotBlank(name);
+        ensureLength(name);
+        ensureOneWhitespaceInMiddle(name);
         ensureWithoutDigits(name);
         ensureLatinCharacters(name);
     }
@@ -38,13 +40,27 @@ public class PlayerName {
 
     private static void ensureWithoutDigits(String name) {
         if (name.codePoints().anyMatch(Character::isDigit)) {
-            throw new IllegalStateException("The name must not contain digits");
+            throw new IllegalArgumentException("The name must not contain digits");
+        }
+    }
+
+    private static void ensureOneWhitespaceInMiddle(String name) {
+        if (name.trim().codePoints().filter(Character::isWhitespace).count() > 1) {
+            throw new IllegalArgumentException("The name can contain only one a whitespace in the middle");
         }
     }
 
     private static void ensureLatinCharacters(String name) {
-        if (name.codePoints().anyMatch((ch) -> isNotLatin(ch) || Character.isWhitespace(ch))) {
+        if (name.trim().codePoints().anyMatch((ch) -> isNotLatin(ch) && !Character.isWhitespace(ch))) {
             throw new IllegalArgumentException("The name must contain only Latin characters");
+        }
+    }
+
+    private static void ensureLength(String name) {
+        if (name.length() < PlayerName.MIN_LENGTH || name.length() > PlayerName.MAX_LENGTH) {
+            throw new IllegalArgumentException(
+                    "The name must contain between %d and %d characters".formatted(MIN_LENGTH, MAX_LENGTH)
+            );
         }
     }
 
