@@ -1,12 +1,14 @@
 package com.ephirious.entity;
 
 import com.ephirious.model.value.PlayerName;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -19,16 +21,21 @@ import java.util.UUID;
 public class PlayerJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     private UUID id;
 
     @Column(nullable = false, length = PlayerName.MAX_LENGTH, unique = true)
     private String name;
 
 
-    public PlayerJpaEntity(String name) {
+    public PlayerJpaEntity(UUID id, String name) {
+        ensureId();
+        this.id = id;
         this.name = name;
+    }
+
+    public PlayerJpaEntity(UUID id) {
+        ensureId();
+        this.id = id;
     }
 
     @Override
@@ -45,5 +52,11 @@ public class PlayerJpaEntity {
 
         return this.id.equals(entity.id) &&
                Objects.equals(name, entity.name);
+    }
+
+    private void ensureId() {
+        if (id == null) {
+            throw new IllegalStateException("PlayerJpaEntity requires not null id");
+        }
     }
 }

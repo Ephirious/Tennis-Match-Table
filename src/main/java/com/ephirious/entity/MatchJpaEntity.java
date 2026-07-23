@@ -1,18 +1,10 @@
 package com.ephirious.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -25,8 +17,6 @@ import java.util.UUID;
 public class MatchJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -41,7 +31,10 @@ public class MatchJpaEntity {
     @JoinColumn(name = "winner_id", nullable = false)
     private PlayerJpaEntity winner;
 
-    public MatchJpaEntity(PlayerJpaEntity first, PlayerJpaEntity second, PlayerJpaEntity winner) {
+    public MatchJpaEntity(UUID id, PlayerJpaEntity first, PlayerJpaEntity second, PlayerJpaEntity winner) {
+        if (id == null) {
+            throw new IllegalStateException("MatchJpaEntity requires not null id");
+        }
         if (Objects.equals(first, second)) {
             throw new IllegalStateException("The match entity can't create, because first player equal second player");
         }
