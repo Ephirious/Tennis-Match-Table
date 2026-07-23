@@ -11,10 +11,19 @@ import java.util.UUID;
 @ToString
 public class Player {
     private final UUID id;
-    private PlayerName name;
+    private final PlayerName name;
+
+    public static Player reconstruct(UUID id, PlayerName name) {
+        return new Player(id, name);
+    }
 
     public Player(PlayerName name) {
-        id = UUIDv7.generate();
+        this.id = UUIDv7.generate();
+        this.name = name;
+    }
+
+    private Player(UUID id, PlayerName name) {
+        this.id = id;
         this.name = name;
     }
 
