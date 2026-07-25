@@ -39,6 +39,7 @@ public class MatchJpaEntity {
             throw new IllegalStateException("The match entity can't create, because first player equal second player");
         }
 
+        this.id = id;
         this.firstPlayer = first;
         this.secondPlayer = second;
         this.winner = winner;
