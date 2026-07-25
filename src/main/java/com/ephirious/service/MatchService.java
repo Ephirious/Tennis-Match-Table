@@ -9,7 +9,9 @@ import com.ephirious.model.value.match.PlayerSide;
 import com.ephirious.repository.CompletedMatchRepository;
 import com.ephirious.repository.OngoingMatchRepository;
 import com.ephirious.repository.PlayerRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,60 +28,100 @@ public class MatchService {
         Player firstPlayer = players.add(new Player(first));
         Player secondPlayer = players.add(new Player(second));
 
+        ensurePlayerNotYetPlaying(firstPlayer);
+        ensurePlayerNotYetPlaying(secondPlayer);
+
         Match match = new Match(firstPlayer.id(), secondPlayer.id());
 
-        ongoing.add(match);
+        ongoing.add(match, firstPlayer, secondPlayer);
 
         return new CreatedMatchDto(match.id());
     }
 
-    public MatchStatusDto awardPoint(UUID matchId, PlayerName target) {
+    public MatchStatusDto awardPoint(@NonNull UUID matchId, @NonNull PlayerName target) {
         Match match = getOngoingMatchOrThrow(matchId);
-        Player first = getPlayerOrThrow(match.firstPlayerId());
-        Player second = getPlayerOrThrow(match.secondPlayerId());
+        Player first = getPlayerOrThrow(match, match.firstPlayerId());
+        Player second = getPlayerOrThrow(match, match.secondPlayerId());
 
         ensureBothPlayersAreMatchPlayers(first.name(), second.name(), target, matchId);
 
-        PlayerSide targetSide = Objects.equals(target, first.name()) ? PlayerSide.FIRST : PlayerSide.SECOND;
-        match.pointTo(targetSide);
+        match.pointTo(getPlayerSideInMatch(target, first.name(), second.name()));
+        Player winner = winner(match);
 
-        Player maybeWinner = match.matchEnded()
-                ? getPlayerOrThrow(match.winner())
-                : null;
+        saveMatchIfEnded(match);
 
-        return MatchStatusDto.fromMatch(match, first, second, maybeWinner);
+        return MatchStatusDto.fromMatch(match, first, second, winner);
     }
 
-    public MatchStatusDto getMatch(UUID matchId) {
+    public MatchStatusDto getMatch(@NonNull UUID matchId) {
         Match match = getOngoingMatchOrThrow(matchId);
-        Player first = getPlayerOrThrow(match.firstPlayerId());
-        Player second = getPlayerOrThrow(match.secondPlayerId());
-        Player maybeWinner = match.matchEnded()
-                ? getPlayerOrThrow(match.winner())
-                : null;
+        Player first = getPlayerOrThrow(match, match.firstPlayerId());
+        Player second = getPlayerOrThrow(match, match.secondPlayerId());
 
-        return MatchStatusDto.fromMatch(match, first, second, maybeWinner);
+        return MatchStatusDto.fromMatch(match, first, second, winner(match));
     }
 
-    private Player getPlayerOrThrow(UUID playerId) {
-        return players.findById(playerId)
+    private void ensurePlayerNotYetPlaying(@NonNull Player player) {
+        if (ongoing.alreadyPlaying(player)) {
+            throw new IllegalStateException(
+                    "Player '%s' has been playing".formatted(player.name().value())
+            );
+        }
+    }
+
+    private Player getPlayerOrThrow(@NonNull Match match, @NonNull UUID playerId) {
+        return ongoing.getPlayersByMatch(match)
+                .map(
+                        players -> Objects.equals(playerId, match.firstPlayerId())
+                                ? players.getFirst()
+                                : players.getLast()
+                )
                 .orElseThrow(
-                        () -> new IllegalStateException("The player by '%s' id hasn't found".formatted(playerId))
+                        () -> new IllegalStateException("Players of match '%s' hasn't found".formatted(match.id()))
                 );
     }
 
-    private Match getOngoingMatchOrThrow(UUID matchId) {
+    private Match getOngoingMatchOrThrow(@NonNull UUID matchId) {
         return ongoing.findById(matchId)
                 .orElseThrow(
-                        () -> new IllegalStateException("The match with '%s' id isn't playing".formatted(matchId))
+                        () -> new IllegalStateException("The match '%s' id hasn't found".formatted(matchId))
                 );
     }
 
-    private void ensureBothPlayersAreMatchPlayers(PlayerName first, PlayerName second, PlayerName target, UUID matchId) {
+    private void ensureBothPlayersAreMatchPlayers(@NonNull PlayerName first,
+                                                  @NonNull PlayerName second,
+                                                  @NonNull PlayerName target,
+                                                  @NonNull UUID matchId
+    ) {
         if (!Objects.equals(target, first) && !Objects.equals(target, second)) {
             throw new IllegalStateException(
-                    "The player with name '%s' isn't playing in match with '%s' id".formatted(target, matchId)
+                    "The player with name '%s' isn't playing in match '%s' id".formatted(target.value(), matchId)
             );
+        }
+    }
+
+    private PlayerSide getPlayerSideInMatch(@NonNull PlayerName target,
+                                            @NonNull PlayerName first,
+                                            @NonNull PlayerName second
+    ) {
+        if (Objects.equals(target, first)) {
+            return PlayerSide.FIRST;
+        } else if (Objects.equals(target, second)) {
+            return PlayerSide.SECOND;
+        }
+        throw new IllegalStateException("There is not player '%s' in match".formatted(target.value()));
+    }
+
+    private @Nullable Player winner(@NonNull Match match) {
+        return match.matchEnded()
+                ? getPlayerOrThrow(match, match.winner())
+                : null;
+    }
+
+    private void saveMatchIfEnded(@NonNull Match match) {
+        if (match.matchEnded()) {
+            ongoing.remove(match);
+            completed.add(match);
         }
     }
 }
