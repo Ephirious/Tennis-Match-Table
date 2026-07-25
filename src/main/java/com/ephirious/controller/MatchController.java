@@ -1,15 +1,16 @@
 package com.ephirious.controller;
 
 import com.ephirious.dto.request.MatchCreateDto;
+import com.ephirious.dto.request.PlayerNamePointDto;
 import com.ephirious.dto.response.CreatedMatchDto;
+import com.ephirious.dto.response.MatchStatusDto;
 import com.ephirious.model.value.PlayerName;
 import com.ephirious.service.MatchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/matches")
@@ -29,4 +30,16 @@ public class MatchController {
 
         return service.createMatch(first, second);
     }
+
+    @PostMapping(
+            path = "/{uuid}/point",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public MatchStatusDto registerPoint(@PathVariable UUID uuid, @Valid @RequestBody PlayerNamePointDto player) {
+        PlayerName name = PlayerName.of(player.name());
+        return service.awardPoint(uuid, name);
+    }
+
+
 }
