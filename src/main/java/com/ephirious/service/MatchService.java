@@ -50,6 +50,17 @@ public class MatchService {
         return MatchStatusDto.fromMatch(match, first, second, maybeWinner);
     }
 
+    public MatchStatusDto getMatch(UUID matchId) {
+        Match match = getOngoingMatchOrThrow(matchId);
+        Player first = getPlayerOrThrow(match.firstPlayerId());
+        Player second = getPlayerOrThrow(match.secondPlayerId());
+        Player maybeWinner = match.matchEnded()
+                ? getPlayerOrThrow(match.winner())
+                : null;
+
+        return MatchStatusDto.fromMatch(match, first, second, maybeWinner);
+    }
+
     private Player getPlayerOrThrow(UUID playerId) {
         return players.findById(playerId)
                 .orElseThrow(

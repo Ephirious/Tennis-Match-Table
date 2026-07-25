@@ -41,5 +41,11 @@ public class MatchController {
         return service.awardPoint(uuid, name);
     }
 
-
+    @GetMapping(
+            path = "/{uuid}",
+            produces = "application/json"
+    )
+    public MatchStatusDto getMatch(@PathVariable UUID uuid) {
+        return service.getMatch(uuid);
+    }
 }
