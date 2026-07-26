@@ -23,11 +23,20 @@ public class Match {
         this.score = new MatchScore();
     }
 
-    public void pointTo(PlayerSide side) {
+    public void pointTo(UUID targetId) {
         if (matchEnded()) {
             throw new IllegalStateException("The match has already ended");
         }
-        score = score.pointTo(side);
+
+        if (Objects.equals(firstPlayerId, targetId)) {
+            score = score.pointTo(PlayerSide.FIRST);
+        } else if (Objects.equals(secondPlayerId, targetId)) {
+            score = score.pointTo(PlayerSide.SECOND);
+        } else {
+            throw new IllegalStateException(
+                    "The player with id '%s' isn't playing in match with id '%s'".formatted(targetId, this.id)
+            );
+        }
     }
 
     public boolean matchEnded() {

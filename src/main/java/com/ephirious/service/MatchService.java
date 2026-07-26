@@ -43,9 +43,7 @@ public class MatchService {
         Player first = getPlayerOrThrow(match, match.firstPlayerId());
         Player second = getPlayerOrThrow(match, match.secondPlayerId());
 
-        ensureBothPlayersAreMatchPlayers(first.name(), second.name(), target, matchId);
-
-        match.pointTo(getPlayerSideInMatch(target, first.name(), second.name()));
+        match.pointTo(resolvePlayerIdByName(target, first, second));
         Player winner = winner(match);
 
         saveMatchIfEnded(match);
@@ -88,30 +86,6 @@ public class MatchService {
                 );
     }
 
-    private void ensureBothPlayersAreMatchPlayers(@NonNull PlayerName first,
-                                                  @NonNull PlayerName second,
-                                                  @NonNull PlayerName target,
-                                                  @NonNull UUID matchId
-    ) {
-        if (!Objects.equals(target, first) && !Objects.equals(target, second)) {
-            throw new IllegalStateException(
-                    "The player with name '%s' isn't playing in match '%s' id".formatted(target.value(), matchId)
-            );
-        }
-    }
-
-    private PlayerSide getPlayerSideInMatch(@NonNull PlayerName target,
-                                            @NonNull PlayerName first,
-                                            @NonNull PlayerName second
-    ) {
-        if (Objects.equals(target, first)) {
-            return PlayerSide.FIRST;
-        } else if (Objects.equals(target, second)) {
-            return PlayerSide.SECOND;
-        }
-        throw new IllegalStateException("There is not player '%s' in match".formatted(target.value()));
-    }
-
     private @Nullable Player winner(@NonNull Match match) {
         return match.matchEnded()
                 ? getPlayerOrThrow(match, match.winner())
@@ -123,5 +97,17 @@ public class MatchService {
             ongoing.remove(match);
             completed.add(match);
         }
+    }
+
+    private UUID resolvePlayerIdByName(@NonNull PlayerName target,
+                                       @NonNull Player first,
+                                       @NonNull Player second) {
+        if (Objects.equals(target, first.name())) {
+            return first.id();
+        }
+        if (Objects.equals(target, second.name())) {
+            return second.id();
+        }
+        throw new IllegalStateException("Unknown player '%s'".formatted(target.value()));
     }
 }
