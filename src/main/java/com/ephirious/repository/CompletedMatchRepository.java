@@ -1,0 +1,13 @@
+package com.ephirious.repository;
+
+import com.ephirious.model.aggregate.Match;
+
+import java.util.UUID;
+
+public interface CompletedMatchRepository {
+    Match findById(UUID id);
+    void add(Match match);
+    void removeByID(Match match);
+    void remove(Match match);
+    Match update(Match match);
+}

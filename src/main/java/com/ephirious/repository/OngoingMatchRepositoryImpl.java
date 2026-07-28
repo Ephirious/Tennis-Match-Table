@@ -5,17 +5,21 @@ import com.ephirious.model.entity.Player;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Component
-public class OngoingMatchRepository {
+public class OngoingMatchRepositoryImpl implements OngoingMatchRepository {
     private final ConcurrentMap<UUID, Match> matches;
     private final ConcurrentMap<Match, List<Player>> playersInConcreteGame;
     private final Set<Player> playersInGame;
 
-    public OngoingMatchRepository() {
+    public OngoingMatchRepositoryImpl() {
         this.matches = new ConcurrentHashMap<>();
         this.playersInConcreteGame = new ConcurrentHashMap<>();
         this.playersInGame = ConcurrentHashMap.newKeySet();

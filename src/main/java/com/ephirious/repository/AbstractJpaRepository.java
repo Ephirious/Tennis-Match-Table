@@ -5,83 +5,77 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 
-public abstract class AbstractJpaRepository<T, ID> implements Repository<T, ID> {
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+public abstract class AbstractJpaRepository<T, ID> {
     protected final EntityManagerFactory entityManagerFactory;
     protected final Class<T> entityClass;
-
 
     protected AbstractJpaRepository(EntityManagerFactory entityManagerFactory, Class<T> entityClass) {
         this.entityManagerFactory = entityManagerFactory;
         this.entityClass = entityClass;
     }
 
-    /*
-    Методы:
-        Optional<T> getById(ID id);
-        List<T> getAllById(ID id);
-     Не будут реализованы в абстрактном классе, так как появляются проблемы с транзакциями.
-     Управление транзакцией нужно либо отдавать на слой сервиса, как это делается в Spring,
-     либо забыть про Lazy-инициализацию объектов и писать Join Fetch запросы вручную через JPQL\HQL
-     Это отдаётся на усмотрение пользователя, который будет наследовать данный класс
-     */
+    public Optional<T> getById(ID id) {
+        return Optional.ofNullable(performReturning(
+                entityManager -> entityManager.find(entityClass, id))
+        );
+    }
 
-    @Override
     public void add(T object) {
-        perform(
-                entityManager -> entityManager.persist(object)
-        );
+        perform(entityManager -> entityManager.persist(object));
     }
 
-    @Override
     public void removeById(ID id) {
-        perform(
-                entityManager -> {
-                    T entity = entityManager.find(entityClass, id);
-                    if (entity != null) {
-                        entityManager.remove(entity);
-                    }
-                }
-        );
+        perform(entityManager -> {
+            T object = entityManager.getReference(entityClass, id);
+            entityManager.remove(object);
+        });
     }
 
-    @Override
     public void remove(T object) {
-        perform(
-                entityManager -> {
-                    T entity = entityManager.merge(object);
-                    entityManager.remove(entity);
-                }
-        );
+        perform(entityManager -> {
+            T newObject = entityManager.contains(object) ? object : entityManager.merge(object);
+            entityManager.remove(newObject);
+        });
     }
 
-    @Override
-    public void update(T object) {
-        perform(
+    public T update(T object) {
+        return performReturning(
                 entityManager -> entityManager.merge(object)
         );
     }
 
-    protected void perform(JpaConsumer operations) {
+    protected <R> R performReturning(Function<EntityManager, R> operations) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             EntityTransaction transaction = entityManager.getTransaction();
 
             try {
                 transaction.begin();
-
-                operations.apply(entityManager);
-
+                R result = operations.apply(entityManager);
                 transaction.commit();
+
+                return result;
 
             } catch (PersistenceException exception) {
                 if (transaction.isActive()) {
                     transaction.rollback();
                 }
-                mapException(exception);
+                throw mapException(exception);
             }
         }
     }
 
-    protected void mapException(PersistenceException exception) {
-        throw exception;
+    protected void perform(Consumer<EntityManager> operations) {
+        performReturning((entityManager) -> {
+            operations.accept(entityManager);
+            return null;
+        });
+    }
+
+    protected RuntimeException mapException(PersistenceException exception) {
+        return exception;
     }
 }
