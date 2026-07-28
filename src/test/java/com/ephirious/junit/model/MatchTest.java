@@ -38,7 +38,7 @@ class MatchTest {
     void shouldGetFirstWinner() {
         int ballsToWin = 48;
         for (int i = 0; i < ballsToWin ; i++) {
-            match.pointTo(PlayerSide.FIRST);
+            match.pointTo(first);
         }
         assertThat(match.winner()).isEqualTo(first);
     }
@@ -47,7 +47,7 @@ class MatchTest {
     void shouldGetSecondWinner() {
         int ballsToWin = 48;
         for (int i = 0; i < ballsToWin ; i++) {
-            match.pointTo(PlayerSide.SECOND);
+            match.pointTo(second);
         }
         assertThat(match.winner()).isEqualTo(second);
     }
