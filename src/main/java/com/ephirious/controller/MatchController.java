@@ -19,11 +19,7 @@ public class MatchController {
     private final MatchService service;
 
 
-    @PostMapping(
-            path = "",
-            consumes = "application/json",
-            produces = "application/json"
-    )
+    @PostMapping(path = "")
     public CreatedMatchDto createMatch(@Valid @RequestBody MatchCreateDto newMatch) {
         PlayerName first = PlayerName.of(newMatch.firstPlayerName());
         PlayerName second = PlayerName.of(newMatch.secondPlayerName());
@@ -31,20 +27,13 @@ public class MatchController {
         return service.createMatch(first, second);
     }
 
-    @PostMapping(
-            path = "/{uuid}/point",
-            consumes = "application/json",
-            produces = "application/json"
-    )
+    @PostMapping(path = "/{uuid}/point")
     public MatchStatusDto registerPoint(@PathVariable UUID uuid, @Valid @RequestBody PlayerNamePointDto player) {
         PlayerName name = PlayerName.of(player.name());
         return service.awardPoint(uuid, name);
     }
 
-    @GetMapping(
-            path = "/{uuid}",
-            produces = "application/json"
-    )
+    @GetMapping(path = "/{uuid}")
     public MatchStatusDto getMatch(@PathVariable UUID uuid) {
         return service.getMatch(uuid);
     }
