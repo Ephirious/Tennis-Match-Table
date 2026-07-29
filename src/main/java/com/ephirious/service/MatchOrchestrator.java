@@ -1,10 +1,12 @@
 package com.ephirious.service;
 
+import com.ephirious.dto.response.CompletedPaginationMatchDto;
 import com.ephirious.dto.response.CreatedMatchDto;
 import com.ephirious.dto.response.MatchStatusDto;
 import com.ephirious.model.aggregate.Match;
 import com.ephirious.model.entity.Player;
 import com.ephirious.model.value.PlayerName;
+import com.ephirious.transaction.TransactionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,33 +19,35 @@ public class MatchOrchestrator {
     private final PlayerService playerService;
     private final CompletedMatchService completedMatchService;
     private final OngoingMatchService ongoingMatchService;
+    private final MatchQueryService matchQueryService;
+    private final TransactionManager transactionManager;
 
     public CreatedMatchDto createMatch(PlayerName firstPlayerName, PlayerName secondPlayerName) {
-        Player firstPlayer = playerService.getOrCreatePlayer(firstPlayerName);
-        Player secondPlayer = playerService.getOrCreatePlayer(secondPlayerName);
-        Match createdMatch = ongoingMatchService.startMatch(firstPlayer, secondPlayer);
-        return new CreatedMatchDto(createdMatch.id());
+        return transactionManager.executeInTransactionReturned(
+                () -> createMatchInternal(firstPlayerName, secondPlayerName)
+        );
     }
 
     public MatchStatusDto awardPoint(UUID matchUUID, PlayerName targetPlayerName) {
-        Match match = ongoingMatchService.findMatchById(matchUUID);
-        Player targetPlayer = playerService.findByName(targetPlayerName);
-        match.pointTo(targetPlayer.id());
-
-        List<Player> players = ongoingMatchService.playersInMatch(match);
-        Player first = players.getFirst();
-        Player second = players.getLast();
-
-        resaveIfMatchEnded(match);
-
-        return getPreparedMatchStatusDto(match, first, second);
+        return transactionManager.executeInTransactionReturned(
+                () -> awardPointInternal(matchUUID, targetPlayerName)
+        );
     }
 
     public MatchStatusDto getPlayingMatch(UUID uuid) {
         Match match = ongoingMatchService.findMatchById(uuid);
         List<Player> players = ongoingMatchService.playersInMatch(match);
-
         return getPreparedMatchStatusDto(match, players.getFirst(), players.getLast());
+    }
+
+    public CompletedPaginationMatchDto getCompletedMatches(int page) {
+        return matchQueryService.getCompletedMatches(page);
+    }
+
+    public CompletedPaginationMatchDto getCompletedMatchesByName(int page, PlayerName name) {
+        return transactionManager.executeInTransactionReturned(
+                () -> matchQueryService.getCompletedMatchesByPlayer(page, name)
+        );
     }
 
     private void resaveIfMatchEnded(Match match) {
@@ -62,4 +66,24 @@ public class MatchOrchestrator {
         );
     }
 
+    private CreatedMatchDto createMatchInternal(PlayerName firstPlayerName, PlayerName secondPlayerName) {
+        Player firstPlayer = playerService.getOrCreatePlayer(firstPlayerName);
+        Player secondPlayer = playerService.getOrCreatePlayer(secondPlayerName);
+        Match createdMatch = ongoingMatchService.startMatch(firstPlayer, secondPlayer);
+        return new CreatedMatchDto(createdMatch.id());
+    }
+
+    private MatchStatusDto awardPointInternal(UUID matchUUID, PlayerName targetPlayerName) {
+        Match match = ongoingMatchService.findMatchById(matchUUID);
+        Player targetPlayer = playerService.findByName(targetPlayerName);
+        match.pointTo(targetPlayer.id());
+
+        List<Player> players = ongoingMatchService.playersInMatch(match);
+        Player first = players.getFirst();
+        Player second = players.getLast();
+
+        resaveIfMatchEnded(match);
+
+        return getPreparedMatchStatusDto(match, first, second);
+    }
 }
