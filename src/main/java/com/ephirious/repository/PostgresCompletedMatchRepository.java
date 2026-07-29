@@ -3,47 +3,54 @@ package com.ephirious.repository;
 import com.ephirious.entity.MatchJpaEntity;
 import com.ephirious.mapper.Mapper;
 import com.ephirious.model.aggregate.Match;
-import jakarta.persistence.EntityManagerFactory;
+import com.ephirious.util.ThreadContext;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
-public class PostgresCompletedMatchRepository extends AbstractJpaRepository<MatchJpaEntity, UUID> implements CompletedMatchRepository {
+public class PostgresCompletedMatchRepository implements CompletedMatchRepository {
     private final Mapper<Match, MatchJpaEntity> mapper;
 
-    public PostgresCompletedMatchRepository(EntityManagerFactory entityManagerFactory,
-                                            Mapper<Match, MatchJpaEntity> matchMapper) {
-        super(entityManagerFactory, MatchJpaEntity.class);
+    public PostgresCompletedMatchRepository(Mapper<Match, MatchJpaEntity> matchMapper) {
         this.mapper = matchMapper;
     }
 
     @Override
     public Match findById(UUID id) {
-        return mapper.reverseMap(
-                getById(id).orElseThrow(() -> new IllegalStateException("The match hasn't found"))
-        );
-    }
-
-    @Override
-    public void removeByID(Match match) {
-        super.removeById(match.id());
+        EntityManager entityManager = ThreadContext.get();
+        return mapper.reverseMap(entityManager.find(MatchJpaEntity.class, id));
     }
 
     @Override
     public void add(Match match) {
-        super.add(mapper.directMap(match));
+        EntityManager entityManager = ThreadContext.get();
+        MatchJpaEntity jpa = mapper.directMap(match);
+        entityManager.persist(jpa);
+    }
+
+    @Override
+    public void removeByID(UUID id) {
+        EntityManager entityManager = ThreadContext.get();
+        MatchJpaEntity jpa = entityManager.find(MatchJpaEntity.class, id);
+        entityManager.remove(jpa);
     }
 
     @Override
     public void remove(Match match) {
-        super.remove(mapper.directMap(match));
+        EntityManager entityManager = ThreadContext.get();
+        MatchJpaEntity jpa = mapper.directMap(match);
+        if (!entityManager.contains(jpa)) {
+            entityManager.merge(jpa);
+        }
+        entityManager.remove(jpa);
     }
 
     @Override
     public Match update(Match match) {
-        return mapper.reverseMap(
-                super.update(mapper.directMap(match))
-        );
+        EntityManager entityManager = ThreadContext.get();
+        MatchJpaEntity jpa = mapper.directMap(match);
+        return mapper.reverseMap(entityManager.merge(jpa));
     }
 }

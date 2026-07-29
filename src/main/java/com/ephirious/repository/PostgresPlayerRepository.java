@@ -5,38 +5,36 @@ import com.ephirious.mapper.Mapper;
 import com.ephirious.mapper.PlayerMapper;
 import com.ephirious.model.entity.Player;
 import com.ephirious.model.value.PlayerName;
-import jakarta.persistence.EntityManagerFactory;
+import com.ephirious.util.ThreadContext;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class PostgresPlayerRepository extends AbstractJpaRepository<PlayerJpaEntity, UUID> implements PlayerRepository {
+public class PostgresPlayerRepository implements PlayerRepository {
     private final Mapper<Player, PlayerJpaEntity> mapper;
 
-    public PostgresPlayerRepository(EntityManagerFactory entityManagerFactory, PlayerMapper playerMapper) {
-        super(entityManagerFactory, PlayerJpaEntity.class);
+    public PostgresPlayerRepository(PlayerMapper playerMapper) {
         this.mapper = playerMapper;
     }
 
     @Override
     public Optional<Player> findByName(PlayerName name) {
-        return Optional.ofNullable(mapper.reverseMap(
-                performReturning(entityManager ->
-                        entityManager.createQuery(
-                                        "select p from PlayerJpaEntity p where p.name = :name"
-                                        , entityClass)
-                                .setParameter("name", name.value())
-                                .getSingleResultOrNull()
-                )
-        ));
+        EntityManager entityManager = ThreadContext.get();
+        String jpql = "SELECT p FROM PlayerJpaEntity p where p.name = :name";
+        PlayerJpaEntity player = entityManager.createQuery(jpql, PlayerJpaEntity.class)
+                .setParameter("name", name.value())
+                .getSingleResult();
+        return Optional.ofNullable(mapper.reverseMap(player));
     }
 
     @Override
     public Optional<Player> findById(UUID id) {
-        return Optional.ofNullable(mapper.reverseMap(
-                performReturning(entityManager -> entityManager.find(entityClass, id)))
+        EntityManager entityManager = ThreadContext.get();
+        return Optional.ofNullable(
+                mapper.reverseMap(entityManager.find(PlayerJpaEntity.class, id))
         );
     }
 
@@ -55,13 +53,12 @@ public class PostgresPlayerRepository extends AbstractJpaRepository<PlayerJpaEnt
                 LIMIT 1;
                 """;
 
-        return mapper.reverseMap(performReturning(
-                        entityManager ->
-                                (PlayerJpaEntity) entityManager.createNativeQuery(nativeSql, entityClass)
-                                        .setParameter("id", player.id())
-                                        .setParameter("name", player.name().value())
-                                        .getSingleResult()
-                )
-        );
+        EntityManager entityManager = ThreadContext.get();
+        PlayerJpaEntity jpaPlayer = (PlayerJpaEntity) entityManager.createNativeQuery(nativeSql, PlayerJpaEntity.class)
+                .setParameter("id", player.id())
+                .setParameter("name", player.name().value())
+                .getSingleResult();
+
+        return mapper.reverseMap(jpaPlayer);
     }
 }
