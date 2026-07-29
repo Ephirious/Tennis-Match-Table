@@ -14,8 +14,9 @@ import static com.ephirious.util.EnvironmentVariableConfig.getEnvVariableOrThrow
 @ComponentScan(basePackages = {
         "com.ephirious.repository",
         "com.ephirious.mapper",
-        "com.ephirious.service"}
-)
+        "com.ephirious.service",
+        "com.ephirious.transaction"
+})
 public class RootConfig {
     private static final String DB_PROTOCOL = getEnvVariableOrThrow("DATABASE_PROTOCOL");
     private static final String DB_SERVER = getEnvVariableOrThrow("DATABASE_SERVER");
