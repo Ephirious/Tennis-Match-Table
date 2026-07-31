@@ -2,6 +2,7 @@ package com.ephirious.model.entity;
 
 import com.ephirious.model.value.PlayerName;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 import xyz.block.uuidv7.UUIDv7;
 
@@ -13,16 +14,16 @@ public class Player {
     private final UUID id;
     private final PlayerName name;
 
-    public static Player reconstruct(UUID id, PlayerName name) {
+    public static Player reconstruct(@NonNull UUID id, @NonNull PlayerName name) {
         return new Player(id, name);
     }
 
-    public Player(PlayerName name) {
+    public Player(@NonNull PlayerName name) {
         this.id = UUIDv7.generate();
         this.name = name;
     }
 
-    private Player(UUID id, PlayerName name) {
+    private Player(@NonNull UUID id, @NonNull PlayerName name) {
         this.id = id;
         this.name = name;
     }

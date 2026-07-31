@@ -6,10 +6,12 @@ import com.ephirious.model.value.PlayerName;
 import com.ephirious.transaction.TransactionManager;
 import com.ephirious.util.ThreadContext;
 import jakarta.persistence.EntityManager;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class MatchQueryService {
         );
     }
 
-    public CompletedPaginationMatchDto getCompletedMatchesByPlayer(int page, PlayerName name) {
+    public CompletedPaginationMatchDto getCompletedMatchesByPlayer(int page, @NonNull PlayerName name) {
         MatchTransactionResult result = transactionManager.executeInTransactionReturned(
                 () -> getCompletedMatchesByPlayerInternal(page, name)
         );

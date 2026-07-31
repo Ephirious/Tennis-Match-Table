@@ -1,6 +1,7 @@
 package com.ephirious.controller;
 
 import com.ephirious.dto.request.MatchCreateDto;
+import com.ephirious.dto.request.MatchesFilterDto;
 import com.ephirious.dto.request.PlayerNamePointDto;
 import com.ephirious.dto.response.CompletedPaginationMatchDto;
 import com.ephirious.dto.response.CreatedMatchDto;
@@ -8,7 +9,10 @@ import com.ephirious.dto.response.MatchStatusDto;
 import com.ephirious.model.value.PlayerName;
 import com.ephirious.service.MatchOrchestrator;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -18,46 +22,37 @@ import java.util.UUID;
 @RequestMapping("/matches")
 @RequiredArgsConstructor
 public class MatchController {
-    private static final String DEFAULT_PAGE = "1";
-    private static final String DEFAULT_PLAYER_NAME = "";
-
     private final MatchOrchestrator matchOrchestrator;
 
 
     @PostMapping(path = "")
-    public CreatedMatchDto createMatch(@Valid @RequestBody MatchCreateDto newMatch) {
+    public ResponseEntity<CreatedMatchDto> createMatch(@Valid @RequestBody MatchCreateDto newMatch) {
         PlayerName first = PlayerName.of(newMatch.firstPlayerName());
         PlayerName second = PlayerName.of(newMatch.secondPlayerName());
-        return matchOrchestrator.createMatch(first, second);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(matchOrchestrator.createMatch(first, second));
     }
 
     @PostMapping(path = "/{uuid}/point")
-    public MatchStatusDto registerPoint(@PathVariable UUID uuid, @Valid @RequestBody PlayerNamePointDto player) {
+    public ResponseEntity<MatchStatusDto> registerPoint(@PathVariable UUID uuid, @Valid @RequestBody PlayerNamePointDto player) {
         PlayerName name = PlayerName.of(player.name());
-        return matchOrchestrator.awardPoint(uuid, name);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(matchOrchestrator.awardPoint(uuid, name));
     }
 
     @GetMapping(path = "/{uuid}")
-    public MatchStatusDto getMatch(@PathVariable UUID uuid) {
-        return matchOrchestrator.getPlayingMatch(uuid);
+    public ResponseEntity<MatchStatusDto> getMatch(@PathVariable UUID uuid) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(matchOrchestrator.getPlayingMatch(uuid));
     }
 
     @GetMapping
-    public CompletedPaginationMatchDto getCompletedMatches(
-            @RequestParam(defaultValue = DEFAULT_PAGE)  int page,
-            @RequestParam(defaultValue = DEFAULT_PLAYER_NAME) String playerName
-    ) {
-        ensurePositivePageValue(page);
-        if (Objects.equals(playerName, DEFAULT_PLAYER_NAME)) {
-            return matchOrchestrator.getCompletedMatches(page);
-        }
-        return matchOrchestrator.getCompletedMatchesByName(page, PlayerName.of(playerName));
-    }
+    public ResponseEntity<CompletedPaginationMatchDto> getCompletedMatches(@Valid MatchesFilterDto params) {
+        CompletedPaginationMatchDto dto = params.hasPlayerName()
+                ? matchOrchestrator.getCompletedMatches(params.page())
+                : matchOrchestrator.getCompletedMatchesByName(params.page(), PlayerName.of(params.playerName()));
 
-
-    private void ensurePositivePageValue(int page) {
-        if (page < 0) {
-            throw new IllegalStateException("The page value must not be negative or equal zero");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 }

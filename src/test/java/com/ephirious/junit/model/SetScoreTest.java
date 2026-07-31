@@ -1,8 +1,8 @@
 package com.ephirious.junit.model;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import com.ephirious.model.value.match.PlayerSide;
 import com.ephirious.model.value.match.SetScore;
-import com.ephirious.model.value.match.TieBreakGame;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +26,7 @@ class SetScoreTest {
 
     @Test
     void shouldThrowWhenWinnerNotDefined() {
-        assertThatThrownBy(score::winner).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(score::winner).isInstanceOf(ContractViolationException.class);
     }
 
     @ParameterizedTest

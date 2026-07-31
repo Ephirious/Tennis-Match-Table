@@ -5,10 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -27,14 +24,12 @@ public class PlayerJpaEntity {
     private String name;
 
 
-    public PlayerJpaEntity(UUID id, String name) {
-        ensureId(id);
+    public PlayerJpaEntity(@NonNull UUID id, @NonNull String name) {
         this.id = id;
         this.name = name;
     }
 
-    public PlayerJpaEntity(UUID id) {
-        ensureId(id);
+    public PlayerJpaEntity(@NonNull UUID id) {
         this.id = id;
     }
 
@@ -52,11 +47,5 @@ public class PlayerJpaEntity {
 
         return this.id.equals(entity.id) &&
                Objects.equals(name, entity.name);
-    }
-
-    private void ensureId(UUID id) {
-        if (id == null) {
-            throw new IllegalStateException("PlayerJpaEntity requires not null id");
-        }
     }
 }

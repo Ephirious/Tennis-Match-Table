@@ -7,6 +7,7 @@ import com.ephirious.model.aggregate.Match;
 import com.ephirious.model.entity.Player;
 import com.ephirious.model.value.PlayerName;
 import com.ephirious.transaction.TransactionManager;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +23,19 @@ public class MatchOrchestrator {
     private final MatchQueryService matchQueryService;
     private final TransactionManager transactionManager;
 
-    public CreatedMatchDto createMatch(PlayerName firstPlayerName, PlayerName secondPlayerName) {
+    public CreatedMatchDto createMatch(@NonNull PlayerName firstPlayerName, @NonNull PlayerName secondPlayerName) {
         return transactionManager.executeInTransactionReturned(
                 () -> createMatchInternal(firstPlayerName, secondPlayerName)
         );
     }
 
-    public MatchStatusDto awardPoint(UUID matchUUID, PlayerName targetPlayerName) {
+    public MatchStatusDto awardPoint(@NonNull UUID matchUUID, @NonNull PlayerName targetPlayerName) {
         return transactionManager.executeInTransactionReturned(
                 () -> awardPointInternal(matchUUID, targetPlayerName)
         );
     }
 
-    public MatchStatusDto getPlayingMatch(UUID uuid) {
+    public MatchStatusDto getPlayingMatch(@NonNull UUID uuid) {
         Match match = ongoingMatchService.findMatchById(uuid);
         List<Player> players = ongoingMatchService.playersInMatch(match);
         return getPreparedMatchStatusDto(match, players.getFirst(), players.getLast());
@@ -44,7 +45,7 @@ public class MatchOrchestrator {
         return matchQueryService.getCompletedMatches(page);
     }
 
-    public CompletedPaginationMatchDto getCompletedMatchesByName(int page, PlayerName name) {
+    public CompletedPaginationMatchDto getCompletedMatchesByName(int page, @NonNull PlayerName name) {
         return transactionManager.executeInTransactionReturned(
                 () -> matchQueryService.getCompletedMatchesByPlayer(page, name)
         );
@@ -62,7 +63,7 @@ public class MatchOrchestrator {
                 match,
                 first,
                 second,
-                ongoingMatchService.matchWinner(match, first, second)
+                ongoingMatchService.matchWinner(match, first, second).orElse(null)
         );
     }
 

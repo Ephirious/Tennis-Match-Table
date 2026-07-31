@@ -1,5 +1,6 @@
 package com.ephirious.model.value.match;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +24,7 @@ public class TieBreakGame implements GameScore {
     @Override
     public PlayerSide winner() {
         if (!hasWinner()) {
-            throw new IllegalStateException("The game's winner didn't define");
+            throw new ContractViolationException("Can't get game's winner, because games isn't over");
         }
         return firstPoints > secondPoints ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
@@ -31,7 +32,7 @@ public class TieBreakGame implements GameScore {
     @Override
     public TieBreakGame pointTo(PlayerSide side) {
         if (hasWinner()) {
-            throw new IllegalStateException("The game's winner already exists");
+            throw new ContractViolationException("Can't increase game score, because game is over");
         }
         if (side == PlayerSide.FIRST) {
             return new TieBreakGame(firstPoints + 1, secondPoints);

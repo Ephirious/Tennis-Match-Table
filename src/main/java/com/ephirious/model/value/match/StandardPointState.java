@@ -1,5 +1,7 @@
 package com.ephirious.model.value.match;
 
+import com.ephirious.exception.domain.ContractViolationException;
+
 public enum StandardPointState {
     LOVE("0"),
     FIFTEEN("15"),
@@ -21,7 +23,7 @@ public enum StandardPointState {
             case LOVE -> FIFTEEN;
             case FIFTEEN -> THIRTY;
             case THIRTY -> FORTY;
-            case FORTY -> throw new IllegalStateException("");
+            case FORTY -> throw new ContractViolationException("The point 'FORTY' doesn't have a next value");
         };
     }
 }

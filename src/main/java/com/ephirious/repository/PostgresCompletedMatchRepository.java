@@ -5,6 +5,7 @@ import com.ephirious.mapper.Mapper;
 import com.ephirious.model.aggregate.Match;
 import com.ephirious.util.ThreadContext;
 import jakarta.persistence.EntityManager;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -18,27 +19,27 @@ public class PostgresCompletedMatchRepository implements CompletedMatchRepositor
     }
 
     @Override
-    public Match findById(UUID id) {
+    public Match findById(@NonNull UUID id) {
         EntityManager entityManager = ThreadContext.get();
         return mapper.reverseMap(entityManager.find(MatchJpaEntity.class, id));
     }
 
     @Override
-    public void add(Match match) {
+    public void add(@NonNull Match match) {
         EntityManager entityManager = ThreadContext.get();
         MatchJpaEntity jpa = mapper.directMap(match);
         entityManager.persist(jpa);
     }
 
     @Override
-    public void removeByID(UUID id) {
+    public void removeByID(@NonNull UUID id) {
         EntityManager entityManager = ThreadContext.get();
         MatchJpaEntity jpa = entityManager.find(MatchJpaEntity.class, id);
         entityManager.remove(jpa);
     }
 
     @Override
-    public void remove(Match match) {
+    public void remove(@NonNull Match match) {
         EntityManager entityManager = ThreadContext.get();
         MatchJpaEntity jpa = mapper.directMap(match);
         if (!entityManager.contains(jpa)) {
@@ -48,7 +49,7 @@ public class PostgresCompletedMatchRepository implements CompletedMatchRepositor
     }
 
     @Override
-    public Match update(Match match) {
+    public Match update(@NonNull Match match) {
         EntityManager entityManager = ThreadContext.get();
         MatchJpaEntity jpa = mapper.directMap(match);
         return mapper.reverseMap(entityManager.merge(jpa));

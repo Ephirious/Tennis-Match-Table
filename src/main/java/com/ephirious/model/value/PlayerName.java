@@ -1,10 +1,8 @@
 package com.ephirious.model.value;
 
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import com.ephirious.exception.domain.InvalidPlayerNameException;
+import lombok.*;
 
 @ToString
 @EqualsAndHashCode
@@ -15,7 +13,7 @@ public class PlayerName {
 
     private final String name;
 
-    public static PlayerName of(String name) {
+    public static PlayerName of(@NonNull String name) {
         ensureName(name);
         return new PlayerName(name.trim());
     }
@@ -34,32 +32,46 @@ public class PlayerName {
 
     private static void ensureNotBlank(String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("The name must not be null or empty");
+            throw new InvalidPlayerNameException(
+                    "The name must not be null or empty",
+                    "The variable 'name' is empty string"
+            );
         }
     }
 
     private static void ensureWithoutDigits(String name) {
         if (name.codePoints().anyMatch(Character::isDigit)) {
-            throw new IllegalArgumentException("The name must not contain digits");
+            throw new InvalidPlayerNameException(
+                    "The name must not contain digits",
+                    "The name '%s' contains digits".formatted(name)
+            );
         }
     }
 
     private static void ensureOneWhitespaceInMiddle(String name) {
         if (name.trim().codePoints().filter(Character::isWhitespace).count() > 1) {
-            throw new IllegalArgumentException("The name can contain only one a whitespace in the middle");
+            throw new InvalidPlayerNameException(
+                    "The name can contain only one a whitespace in the middle",
+                    "The name '%s' contains a lot of whitespaces in the middle".formatted(name)
+            );
         }
     }
 
     private static void ensureLatinCharacters(String name) {
         if (name.trim().codePoints().anyMatch((ch) -> isNotLatin(ch) && !Character.isWhitespace(ch))) {
-            throw new IllegalArgumentException("The name must contain only Latin characters");
+            throw new InvalidPlayerNameException(
+                    "The name must contain only Latin characters",
+                    "The name '%s' contains not Latin characters"
+            );
         }
     }
 
     private static void ensureLength(String name) {
-        if (name.length() < PlayerName.MIN_LENGTH || name.length() > PlayerName.MAX_LENGTH) {
-            throw new IllegalArgumentException(
-                    "The name must contain between %d and %d characters".formatted(MIN_LENGTH, MAX_LENGTH)
+        if (name.length() < MIN_LENGTH || name.length() > MAX_LENGTH) {
+            throw new InvalidPlayerNameException(
+                    "The name must contain between %d and %d characters".formatted(MIN_LENGTH, MAX_LENGTH),
+                    "The name '%s' contains %d characters, but expected between %d and %d characters"
+                            .formatted(name, name.length(), MIN_LENGTH, MAX_LENGTH)
             );
         }
     }

@@ -1,5 +1,6 @@
 package com.ephirious.model.value.match;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class MatchScore {
 
     public MatchScore pointTo(PlayerSide side) {
         if (hasWinner()) {
-            throw new IllegalStateException("Winner already exists");
+            throw new ContractViolationException("Can't increase match score, because match is over");
         }
 
         SetScore newSet = currentSet.pointTo(side);
@@ -33,7 +34,7 @@ public class MatchScore {
 
     public PlayerSide winner() {
         if (!hasWinner()) {
-            throw new IllegalStateException("The match's winner didn't define");
+            throw new ContractViolationException("Can't get match's winner, because match isn't over");
         }
         return firstSetPoints == 2 ? PlayerSide.FIRST : PlayerSide.SECOND;
     }

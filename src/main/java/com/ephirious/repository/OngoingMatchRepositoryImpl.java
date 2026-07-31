@@ -1,5 +1,6 @@
 package com.ephirious.repository;
 
+import com.ephirious.exception.repository.OngoingMatchAlreadyRemovedException;
 import com.ephirious.model.aggregate.Match;
 import com.ephirious.model.entity.Player;
 import lombok.NonNull;
@@ -38,7 +39,7 @@ public class OngoingMatchRepositoryImpl implements OngoingMatchRepository {
         playersInGame.add(second);
     }
 
-    public Optional<List<Player>> getPlayersByMatch(Match match) {
+    public Optional<List<Player>> getPlayersByMatch(@NonNull Match match) {
         return Optional.ofNullable(
                 playersInConcreteGame.getOrDefault(match, null)
         );
@@ -48,7 +49,9 @@ public class OngoingMatchRepositoryImpl implements OngoingMatchRepository {
         Match removed = matches.remove(match.id());
 
         if (removed == null) {
-            throw new IllegalStateException("The match '%s' has already removed".formatted(match.id()));
+            throw new OngoingMatchAlreadyRemovedException(
+                    "The match '%s' has already removed".formatted(match.id())
+            );
         }
 
         List<Player> playersInMatch = playersInConcreteGame.remove(removed);
@@ -64,9 +67,9 @@ public class OngoingMatchRepositoryImpl implements OngoingMatchRepository {
     }
 
 
-    private void putIfAbsentOrThrow(@NonNull Match match) {
+    private void putIfAbsentOrThrow(Match match) {
         if (matches.putIfAbsent(match.id(), match) != null) {
-            throw new IllegalStateException(
+            throw new OngoingMatchAlreadyRemovedException(
                     "The match with id '%s' has been playing".formatted(match.id())
             );
         }

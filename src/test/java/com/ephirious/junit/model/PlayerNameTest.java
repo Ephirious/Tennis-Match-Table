@@ -1,5 +1,7 @@
 package com.ephirious.junit.model;
 
+import com.ephirious.exception.domain.ContractViolationException;
+import com.ephirious.exception.domain.InvalidPlayerNameException;
 import com.ephirious.model.value.PlayerName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -8,14 +10,17 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerNameTest {
     @ParameterizedTest
     @NullAndEmptySource
     void shouldThrowWhenNameNullOrEmpty(String name) {
-        assertThrows(IllegalArgumentException.class, () -> PlayerName.of(name));
+        assertThatThrownBy(() -> PlayerName.of(name)).isInstanceOfAny(
+                NullPointerException.class,
+                InvalidPlayerNameException.class
+        );
     }
 
     @ParameterizedTest
@@ -23,7 +28,7 @@ class PlayerNameTest {
             "T e s t"
     })
     void shouldForbidWhitespacesInMiddle(String name) {
-        assertThrows(IllegalArgumentException.class, () -> PlayerName.of(name));
+        assertThrows(InvalidPlayerNameException.class, () -> PlayerName.of(name));
     }
 
     @ParameterizedTest
@@ -44,7 +49,7 @@ class PlayerNameTest {
     @ParameterizedTest
     @MethodSource("invalidNameLength")
     void shouldForbidInvalidNameLength(String name) {
-        assertThrows(IllegalArgumentException.class, () -> PlayerName.of(name));
+        assertThrows(InvalidPlayerNameException.class, () -> PlayerName.of(name));
     }
 
     @ParameterizedTest
@@ -54,7 +59,7 @@ class PlayerNameTest {
             "Test3"
     })
     void shouldForbidDigitsInName(String name) {
-        assertThrows(IllegalArgumentException.class, () -> PlayerName.of(name));
+        assertThrows(InvalidPlayerNameException.class, () -> PlayerName.of(name));
     }
 
     @ParameterizedTest
@@ -64,7 +69,7 @@ class PlayerNameTest {
             " TeSttt."
     })
     void shouldForbidNoLatinCharacters(String name) {
-        assertThrows(IllegalArgumentException.class, () -> PlayerName.of(name));
+        assertThrows(InvalidPlayerNameException.class, () -> PlayerName.of(name));
     }
 
 

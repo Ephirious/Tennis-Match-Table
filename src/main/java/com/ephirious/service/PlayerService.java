@@ -1,5 +1,6 @@
 package com.ephirious.service;
 
+import com.ephirious.exception.service.UnknownPlayerException;
 import com.ephirious.model.entity.Player;
 import com.ephirious.model.value.PlayerName;
 import com.ephirious.repository.PlayerRepository;
@@ -24,7 +25,10 @@ public class PlayerService {
     public Player findByName(PlayerName name) {
         return transactionManager.executeInTransactionReturned(() -> repository.findByName(name))
                 .orElseThrow(
-                        () -> new IllegalStateException("Unknown player name '%s'".formatted(name.value()))
+                        () -> new UnknownPlayerException(
+                                "The player '%s' can't be found".formatted(name.value()),
+                                "Unknown player name '%s'".formatted(name.value())
+                        )
                 );
     }
 }

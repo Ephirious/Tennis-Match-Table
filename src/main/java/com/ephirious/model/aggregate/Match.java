@@ -1,7 +1,10 @@
 package com.ephirious.model.aggregate;
 
+import com.ephirious.exception.domain.ContractViolationException;
+import com.ephirious.exception.domain.UnknowWhichPlayerAwardPointException;
 import com.ephirious.model.value.match.MatchScore;
 import com.ephirious.model.value.match.PlayerSide;
+import lombok.NonNull;
 import xyz.block.uuidv7.UUIDv7;
 
 import java.util.Objects;
@@ -13,8 +16,7 @@ public class Match {
     private final UUID secondPlayerId;
     private MatchScore score;
 
-    public Match(UUID firstPlayerId, UUID secondPlayerId) {
-        ensureNotNullUuid(firstPlayerId, secondPlayerId);
+    public Match(@NonNull UUID firstPlayerId, @NonNull UUID secondPlayerId) {
         ensureNotSameUuid(firstPlayerId, secondPlayerId);
 
         this.id = UUIDv7.generate();
@@ -23,9 +25,11 @@ public class Match {
         this.score = new MatchScore();
     }
 
-    public void pointTo(UUID targetId) {
+    public void pointTo(@NonNull UUID targetId) {
         if (matchEnded()) {
-            throw new IllegalStateException("The match has already ended");
+            throw new ContractViolationException(
+                    "Can't increase the number of points for any player, because match is over"
+            );
         }
 
         if (Objects.equals(firstPlayerId, targetId)) {
@@ -33,8 +37,11 @@ public class Match {
         } else if (Objects.equals(secondPlayerId, targetId)) {
             score = score.pointTo(PlayerSide.SECOND);
         } else {
-            throw new IllegalStateException(
-                    "The player with id '%s' isn't playing in match with id '%s'".formatted(targetId, this.id)
+            throw new UnknowWhichPlayerAwardPointException(
+                    "The specified player will not be awarded a point, as he does not belong to the match",
+                    "Can't increase the number of points for any player, because match has two players: " +
+                    "first - '%s', second - '%s', but target player has '%s' id"
+                            .formatted(firstPlayerId, secondPlayerId, targetId)
             );
         }
     }
@@ -45,7 +52,7 @@ public class Match {
 
     public UUID winner() {
         if (!matchEnded()) {
-            throw new IllegalStateException("The match's winner didn't define");
+            throw new ContractViolationException("Not possible to get winner, because match is not over");
         }
         if (score.winner() == PlayerSide.FIRST) {
             return firstPlayerId;
@@ -69,15 +76,9 @@ public class Match {
         return secondPlayerId;
     }
 
-    private void ensureNotNullUuid(UUID first, UUID second) {
-        if (first == null || second == null) {
-            throw new IllegalStateException("The two player ids must be not null");
-        }
-    }
-
     private void ensureNotSameUuid(UUID firstPlayerId, UUID secondPlayerId) {
         if (Objects.equals(firstPlayerId, secondPlayerId)) {
-            throw new IllegalStateException("The match can't create, because first player's id equal second player's id");
+            throw new ContractViolationException("The two players have same id");
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.ephirious.model.value.match;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class StandardGame implements GameScore {
 
     @Override
     public PlayerSide winner() {
-        throw new UnsupportedOperationException("The method isn't supported; Follow with the contract");
+        throw new ContractViolationException("The method isn't supported; Follow with the contract");
     }
 
     @Override

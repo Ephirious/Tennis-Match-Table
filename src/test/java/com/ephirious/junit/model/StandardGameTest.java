@@ -1,5 +1,6 @@
 package com.ephirious.junit.model;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import com.ephirious.model.value.match.GameScore;
 import com.ephirious.model.value.match.PlayerSide;
 import com.ephirious.model.value.match.StandardGame;
@@ -32,8 +33,7 @@ class StandardGameTest {
             newGame = newGame.pointTo(side);
         }
         assertThatThrownBy(newGame::winner).isInstanceOfAny(
-                IllegalStateException.class,
-                UnsupportedOperationException.class
+                ContractViolationException.class
         );
     }
 

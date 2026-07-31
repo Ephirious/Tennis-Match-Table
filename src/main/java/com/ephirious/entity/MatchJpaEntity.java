@@ -1,10 +1,7 @@
 package com.ephirious.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -31,10 +28,12 @@ public class MatchJpaEntity {
     @JoinColumn(name = "winner_id", nullable = false)
     private PlayerJpaEntity winner;
 
-    public MatchJpaEntity(UUID id, PlayerJpaEntity first, PlayerJpaEntity second, PlayerJpaEntity winner) {
-        if (id == null) {
-            throw new IllegalStateException("MatchJpaEntity requires not null id");
-        }
+    public MatchJpaEntity(
+            @NonNull UUID id,
+            @NonNull PlayerJpaEntity first,
+            @NonNull PlayerJpaEntity second,
+            @NonNull PlayerJpaEntity winner
+    ) {
         if (Objects.equals(first, second)) {
             throw new IllegalStateException("The match entity can't create, because first player equal second player");
         }

@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
 public class TransactionManager {
     private final EntityManagerFactory entityManagerFactory;
 
-    public <R> R executeInTransactionReturned(Supplier<R> operations) {
+    public <R> R executeInTransactionReturned(@NonNull Supplier<R> operations) {
         EntityManager alreadyExisted = ThreadContext.get();
         if (alreadyExisted != null && alreadyExisted.getTransaction().isActive()) {
             return operations.get();
@@ -40,7 +41,7 @@ public class TransactionManager {
         }
     }
 
-    public void executeInTransaction(Runnable operations) {
+    public void executeInTransaction(@NonNull Runnable operations) {
         executeInTransactionReturned(
                 () -> {
                     operations.run();

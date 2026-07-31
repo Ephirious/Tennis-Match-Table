@@ -7,6 +7,7 @@ import com.ephirious.model.entity.Player;
 import com.ephirious.model.value.PlayerName;
 import com.ephirious.util.ThreadContext;
 import jakarta.persistence.EntityManager;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -21,17 +22,17 @@ public class PostgresPlayerRepository implements PlayerRepository {
     }
 
     @Override
-    public Optional<Player> findByName(PlayerName name) {
+    public Optional<Player> findByName(@NonNull PlayerName name) {
         EntityManager entityManager = ThreadContext.get();
         String jpql = "SELECT p FROM PlayerJpaEntity p where p.name = :name";
         PlayerJpaEntity player = entityManager.createQuery(jpql, PlayerJpaEntity.class)
                 .setParameter("name", name.value())
-                .getSingleResult();
+                .getSingleResultOrNull();
         return Optional.ofNullable(mapper.reverseMap(player));
     }
 
     @Override
-    public Optional<Player> findById(UUID id) {
+    public Optional<Player> findById(@NonNull UUID id) {
         EntityManager entityManager = ThreadContext.get();
         return Optional.ofNullable(
                 mapper.reverseMap(entityManager.find(PlayerJpaEntity.class, id))
@@ -39,7 +40,7 @@ public class PostgresPlayerRepository implements PlayerRepository {
     }
 
     @Override
-    public Player addIfAbsent(Player player) {
+    public Player addIfAbsent(@NonNull Player player) {
         String nativeSql = """
                 WITH ins AS (
                     INSERT INTO players (id, name)
@@ -57,7 +58,7 @@ public class PostgresPlayerRepository implements PlayerRepository {
         PlayerJpaEntity jpaPlayer = (PlayerJpaEntity) entityManager.createNativeQuery(nativeSql, PlayerJpaEntity.class)
                 .setParameter("id", player.id())
                 .setParameter("name", player.name().value())
-                .getSingleResult();
+                .getSingleResultOrNull();
 
         return mapper.reverseMap(jpaPlayer);
     }

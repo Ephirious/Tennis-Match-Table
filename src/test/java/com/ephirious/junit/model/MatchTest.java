@@ -1,7 +1,7 @@
 package com.ephirious.junit.model;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import com.ephirious.model.aggregate.Match;
-import com.ephirious.model.value.match.PlayerSide;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,10 +12,9 @@ import xyz.block.uuidv7.UUIDv7;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MatchTest {
     private UUID first;
@@ -31,7 +30,7 @@ class MatchTest {
 
     @Test
     void shouldThrowWhenTryToGetWinnerButItNotDefine() {
-        assertThrows(IllegalStateException.class, () -> match.winner());
+        assertThrows(ContractViolationException.class, () -> match.winner());
     }
 
     @Test
@@ -56,14 +55,14 @@ class MatchTest {
     void shouldThroeWhenCreateMatchWithSamePlayerId() {
         UUID first = UUID.randomUUID();
         assertThatThrownBy(() -> new Match(first, first))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ContractViolationException.class);
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidUuid")
     void shouldThrowWhenCreateMatchWithNullPlayerId(UUID first, UUID second) {
         assertThatThrownBy(() -> new Match(first, second))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOfAny(ContractViolationException.class, NullPointerException.class);
     }
 
     public static Stream<Arguments> provideInvalidUuid(){

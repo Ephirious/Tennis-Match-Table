@@ -1,5 +1,6 @@
 package com.ephirious.junit.model;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import com.ephirious.model.value.match.FinalGameState;
 import com.ephirious.model.value.match.FinalStandardGame;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,8 @@ import java.util.stream.Stream;
 
 import static com.ephirious.model.value.match.PlayerSide.FIRST;
 import static com.ephirious.model.value.match.PlayerSide.SECOND;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class FinalStandardGameTest {
     private final FinalStandardGame game = new FinalStandardGame(FinalGameState.DEUCE);
@@ -18,7 +20,7 @@ class FinalStandardGameTest {
     @ParameterizedTest
     @MethodSource("providedNotWinnerState")
     void shouldThrowWhenWinnerNotDefined(FinalStandardGame game) {
-        assertThatThrownBy(game::winner).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(game::winner).isInstanceOf(ContractViolationException.class);
     }
 
     @Test

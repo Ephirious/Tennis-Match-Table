@@ -1,5 +1,6 @@
 package com.ephirious.model.value.match;
 
+import com.ephirious.exception.domain.ContractViolationException;
 import lombok.RequiredArgsConstructor;
 
 import static com.ephirious.model.value.match.FinalGameState.*;
@@ -16,7 +17,7 @@ public class FinalStandardGame implements GameScore {
     @Override
     public PlayerSide winner() {
         if (!hasWinner()) {
-            throw new IllegalStateException("The game's winner didn't define");
+            throw new ContractViolationException("Can't get game's winner, because the game has not ended");
         }
         return state == WIN_FIRST ? PlayerSide.FIRST : PlayerSide.SECOND;
     }
@@ -24,7 +25,7 @@ public class FinalStandardGame implements GameScore {
     @Override
     public FinalStandardGame pointTo(PlayerSide side) {
         if (hasWinner()) {
-            throw new IllegalStateException("The game's winner already exists");
+            throw new ContractViolationException("Can't increase point in the game, because the game is over");
         }
 
         return switch (state) {
