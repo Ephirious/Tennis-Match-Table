@@ -4,6 +4,7 @@ import com.ephirious.dto.response.ExceptionDto;
 import com.ephirious.exception.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,7 +21,12 @@ public class MainExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionDto> handleValidationException(MethodArgumentNotValidException exception) {
-        String message = exception.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
+        ObjectError error = exception.getBindingResult().getAllErrors().getFirst();
+
+        String message = error.getDefaultMessage() != null
+                ? error.getDefaultMessage()
+                : "Validation error";
+
         ExceptionDto dto = new ExceptionDto(message);
         exception.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(dto);
