@@ -1,4 +1,4 @@
-package com.ephirious.model.value.match;
+package com.ephirious.model.value.score.game;
 
 import com.ephirious.exception.domain.ContractViolationException;
 

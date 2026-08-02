@@ -1,4 +1,4 @@
-package com.ephirious.model.value;
+package com.ephirious.model.value.player;
 
 
 import com.ephirious.exception.domain.InvalidPlayerNameException;

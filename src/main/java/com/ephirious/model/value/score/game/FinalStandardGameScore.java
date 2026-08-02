@@ -1,12 +1,13 @@
-package com.ephirious.model.value.match;
+package com.ephirious.model.value.score.game;
 
 import com.ephirious.exception.domain.ContractViolationException;
+import com.ephirious.model.value.score.PlayerSide;
 import lombok.RequiredArgsConstructor;
 
-import static com.ephirious.model.value.match.FinalGameState.*;
+import static com.ephirious.model.value.score.game.FinalGameState.*;
 
 @RequiredArgsConstructor
-public class FinalStandardGame implements GameScore {
+public class FinalStandardGameScore extends AbstractGameScore<String> {
     private final FinalGameState state;
 
     @Override
@@ -23,24 +24,24 @@ public class FinalStandardGame implements GameScore {
     }
 
     @Override
-    public FinalStandardGame pointTo(PlayerSide side) {
+    public FinalStandardGameScore pointTo(PlayerSide side) {
         if (hasWinner()) {
             throw new ContractViolationException("Can't increase point in the game, because the game is over");
         }
 
         return switch (state) {
-            case FinalGameState st when st == AD_FIRST && side == PlayerSide.FIRST -> new FinalStandardGame(WIN_FIRST);
-            case FinalGameState st when st == AD_FIRST && side == PlayerSide.SECOND -> new FinalStandardGame(DEUCE);
-            case FinalGameState st when st == AD_SECOND && side == PlayerSide.SECOND -> new FinalStandardGame(WIN_SECOND);
-            case FinalGameState st when st == AD_SECOND && side == PlayerSide.FIRST -> new FinalStandardGame(DEUCE);
-            case FinalGameState st when st == DEUCE && side == PlayerSide.FIRST -> new FinalStandardGame(AD_FIRST);
-            case FinalGameState st when st == DEUCE && side == PlayerSide.SECOND -> new FinalStandardGame(AD_SECOND);
+            case FinalGameState st when st == AD_FIRST && side == PlayerSide.FIRST -> new FinalStandardGameScore(WIN_FIRST);
+            case FinalGameState st when st == AD_FIRST && side == PlayerSide.SECOND -> new FinalStandardGameScore(DEUCE);
+            case FinalGameState st when st == AD_SECOND && side == PlayerSide.SECOND -> new FinalStandardGameScore(WIN_SECOND);
+            case FinalGameState st when st == AD_SECOND && side == PlayerSide.FIRST -> new FinalStandardGameScore(DEUCE);
+            case FinalGameState st when st == DEUCE && side == PlayerSide.FIRST -> new FinalStandardGameScore(AD_FIRST);
+            case FinalGameState st when st == DEUCE && side == PlayerSide.SECOND -> new FinalStandardGameScore(AD_SECOND);
             default -> throw new IllegalStateException();
         };
     }
 
     @Override
-    public String firstPlayerPoints() {
+    public String firstPlayerScore() {
         return switch (state) {
             case AD_FIRST -> "AD";
             case AD_SECOND, DEUCE -> "40";
@@ -49,7 +50,7 @@ public class FinalStandardGame implements GameScore {
     }
 
     @Override
-    public String secondPlayerPoints() {
+    public String secondPlayerScore() {
         return switch (state) {
             case AD_SECOND -> "AD";
             case AD_FIRST, DEUCE -> "40";

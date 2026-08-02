@@ -1,6 +1,6 @@
 package com.ephirious.model.entity;
 
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;

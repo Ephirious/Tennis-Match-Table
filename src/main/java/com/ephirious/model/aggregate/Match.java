@@ -2,8 +2,10 @@ package com.ephirious.model.aggregate;
 
 import com.ephirious.exception.domain.ContractViolationException;
 import com.ephirious.exception.domain.UnknowWhichPlayerAwardPointException;
-import com.ephirious.model.value.match.MatchScore;
-import com.ephirious.model.value.match.PlayerSide;
+import com.ephirious.model.value.score.PlayerSide;
+import com.ephirious.model.value.score.match.AbstractMatchScore;
+import com.ephirious.model.value.score.match.FiveSetMatchScore;
+import com.ephirious.model.value.score.match.ThreeSetMatchScore;
 import lombok.NonNull;
 import xyz.block.uuidv7.UUIDv7;
 
@@ -14,15 +16,19 @@ public class Match {
     private final UUID id;
     private final UUID firstPlayerId;
     private final UUID secondPlayerId;
-    private MatchScore score;
+    private AbstractMatchScore score;
 
-    public Match(@NonNull UUID firstPlayerId, @NonNull UUID secondPlayerId) {
+    public Match(@NonNull UUID firstPlayerId, @NonNull UUID secondPlayerId, @NonNull MatchType type) {
         ensureNotSameUuid(firstPlayerId, secondPlayerId);
 
         this.id = UUIDv7.generate();
         this.firstPlayerId = firstPlayerId;
         this.secondPlayerId = secondPlayerId;
-        this.score = new MatchScore();
+
+        this.score = switch (type) {
+            case BEST_OF_THREE -> new ThreeSetMatchScore();
+            case BEST_OF_FIVE -> new FiveSetMatchScore();
+        };
     }
 
     public void pointTo(@NonNull UUID targetId) {
@@ -60,7 +66,7 @@ public class Match {
         return secondPlayerId;
     }
 
-    public MatchScore score() {
+    public AbstractMatchScore score() {
         return score;
     }
 

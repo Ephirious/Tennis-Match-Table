@@ -1,4 +1,4 @@
-package com.ephirious.model.value.match;
+package com.ephirious.model.value.score;
 
 public enum PlayerSide {
     FIRST,

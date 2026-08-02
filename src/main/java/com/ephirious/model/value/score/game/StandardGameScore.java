@@ -1,15 +1,19 @@
-package com.ephirious.model.value.match;
+package com.ephirious.model.value.score.game;
 
 import com.ephirious.exception.domain.ContractViolationException;
-import lombok.RequiredArgsConstructor;
+import com.ephirious.model.value.score.PlayerSide;
 
-@RequiredArgsConstructor
-public class StandardGame implements GameScore {
+public class StandardGameScore extends AbstractGameScore<String> {
     private final StandardPointState first;
     private final StandardPointState second;
 
-    public StandardGame() {
+    public StandardGameScore() {
         first = second = StandardPointState.LOVE;
+    }
+
+    private StandardGameScore(StandardPointState first, StandardPointState second) {
+        this.first = first;
+        this.second = second;
     }
 
     @Override
@@ -23,28 +27,28 @@ public class StandardGame implements GameScore {
     }
 
     @Override
-    public GameScore pointTo(PlayerSide side) {
+    public AbstractGameScore<?> pointTo(PlayerSide side) {
         if (isFirstWin(side)) {
-            return new FinalStandardGame(FinalGameState.WIN_FIRST);
+            return new FinalStandardGameScore(FinalGameState.WIN_FIRST);
         } else if (isSecondWin(side)) {
-            return new FinalStandardGame(FinalGameState.WIN_SECOND);
+            return new FinalStandardGameScore(FinalGameState.WIN_SECOND);
         } else if (isDeuce(side)) {
-            return new FinalStandardGame(FinalGameState.DEUCE);
+            return new FinalStandardGameScore(FinalGameState.DEUCE);
         }
 
         if (side == PlayerSide.FIRST) {
-            return new StandardGame(first.next(), second);
+            return new StandardGameScore(first.next(), second);
         }
-        return new StandardGame(first, second.next());
+        return new StandardGameScore(first, second.next());
     }
 
     @Override
-    public String firstPlayerPoints() {
+    public String firstPlayerScore() {
         return first.value();
     }
 
     @Override
-    public String secondPlayerPoints() {
+    public String secondPlayerScore() {
         return second.value();
     }
 
