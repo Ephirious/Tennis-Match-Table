@@ -2,8 +2,7 @@ package com.ephirious.mapper;
 
 import com.ephirious.entity.PlayerJpaEntity;
 import com.ephirious.model.entity.Player;
-import com.ephirious.model.value.PlayerName;
-import lombok.NonNull;
+import com.ephirious.model.value.player.PlayerName;
 import org.springframework.stereotype.Component;
 
 @Component

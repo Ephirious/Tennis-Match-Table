@@ -1,6 +1,6 @@
 package com.ephirious.dto.request;
 
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

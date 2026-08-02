@@ -6,22 +6,23 @@ import com.ephirious.dto.request.PlayerNamePointDto;
 import com.ephirious.dto.response.CompletedPaginationMatchDto;
 import com.ephirious.dto.response.CreatedMatchDto;
 import com.ephirious.dto.response.MatchStatusDto;
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import com.ephirious.service.MatchOrchestrator;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/matches")
 @RequiredArgsConstructor
 public class MatchController {
+    private static final String BEST_OF_THREE_TYPE = "bo3";
+    private static final String BEST_OF_FIVE_TYPE = "bo5";
+
     private final MatchOrchestrator matchOrchestrator;
 
 
@@ -30,8 +31,12 @@ public class MatchController {
         PlayerName first = PlayerName.of(newMatch.firstPlayerName());
         PlayerName second = PlayerName.of(newMatch.secondPlayerName());
 
+        if (newMatch.type().equals(BEST_OF_THREE_TYPE)) {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(matchOrchestrator.createBestOfThreeMatch(first, second));
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(matchOrchestrator.createMatch(first, second));
+                .body(matchOrchestrator.createBestOfFiveMatch(first, second));
     }
 
     @PostMapping(path = "/{uuid}/point")
@@ -50,8 +55,8 @@ public class MatchController {
     @GetMapping
     public ResponseEntity<CompletedPaginationMatchDto> getCompletedMatches(@Valid MatchesFilterDto params) {
         CompletedPaginationMatchDto dto = params.hasPlayerName()
-                ? matchOrchestrator.getCompletedMatches(params.page())
-                : matchOrchestrator.getCompletedMatchesByName(params.page(), PlayerName.of(params.playerName()));
+                ? matchOrchestrator.getCompletedMatchesByName(params.page(), PlayerName.of(params.playerName()))
+                : matchOrchestrator.getCompletedMatches(params.page());
 
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }

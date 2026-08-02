@@ -2,7 +2,7 @@ package com.ephirious.service;
 
 import com.ephirious.dto.response.CompletedMatchDto;
 import com.ephirious.dto.response.CompletedPaginationMatchDto;
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import com.ephirious.transaction.TransactionManager;
 import com.ephirious.util.ThreadContext;
 import jakarta.persistence.EntityManager;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

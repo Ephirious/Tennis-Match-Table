@@ -2,6 +2,7 @@ package com.ephirious.service;
 
 import com.ephirious.exception.service.UnknownMatchException;
 import com.ephirious.model.aggregate.Match;
+import com.ephirious.model.aggregate.MatchType;
 import com.ephirious.model.entity.Player;
 import com.ephirious.repository.OngoingMatchRepository;
 import org.jspecify.annotations.NonNull;
@@ -20,11 +21,20 @@ public class OngoingMatchService {
         this.repository = ongoingMatchRepositoryImpl;
     }
 
-    public Match startMatch(@NonNull Player first, @NonNull Player second) {
+    public Match startThreeSetMatch(@NonNull Player first, @NonNull Player second) {
         ensurePlayerNotPlayingNow(first);
         ensurePlayerNotPlayingNow(second);
 
-        Match match = new Match(first.id(), second.id());
+        Match match = new Match(first.id(), second.id(), MatchType.BEST_OF_THREE);
+        repository.add(match, first, second);
+        return match;
+    }
+
+    public Match startFiveSetMatch(@NonNull Player first, @NonNull Player second) {
+        ensurePlayerNotPlayingNow(first);
+        ensurePlayerNotPlayingNow(second);
+
+        Match match = new Match(first.id(), second.id(), MatchType.BEST_OF_FIVE);
         repository.add(match, first, second);
         return match;
     }

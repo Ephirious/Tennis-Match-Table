@@ -2,7 +2,7 @@ package com.ephirious.service;
 
 import com.ephirious.exception.service.UnknownPlayerException;
 import com.ephirious.model.entity.Player;
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import com.ephirious.repository.PlayerRepository;
 import com.ephirious.transaction.TransactionManager;
 import org.springframework.stereotype.Service;

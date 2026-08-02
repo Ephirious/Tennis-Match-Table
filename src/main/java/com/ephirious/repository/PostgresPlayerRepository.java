@@ -4,7 +4,7 @@ import com.ephirious.entity.PlayerJpaEntity;
 import com.ephirious.mapper.Mapper;
 import com.ephirious.mapper.PlayerMapper;
 import com.ephirious.model.entity.Player;
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import com.ephirious.util.ThreadContext;
 import jakarta.persistence.EntityManager;
 import lombok.NonNull;

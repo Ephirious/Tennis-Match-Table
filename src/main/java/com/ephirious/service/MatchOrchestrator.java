@@ -5,7 +5,7 @@ import com.ephirious.dto.response.CreatedMatchDto;
 import com.ephirious.dto.response.MatchStatusDto;
 import com.ephirious.model.aggregate.Match;
 import com.ephirious.model.entity.Player;
-import com.ephirious.model.value.PlayerName;
+import com.ephirious.model.value.player.PlayerName;
 import com.ephirious.transaction.TransactionManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,15 @@ public class MatchOrchestrator {
     private final MatchQueryService matchQueryService;
     private final TransactionManager transactionManager;
 
-    public CreatedMatchDto createMatch(@NonNull PlayerName firstPlayerName, @NonNull PlayerName secondPlayerName) {
+    public CreatedMatchDto createBestOfThreeMatch(@NonNull PlayerName firstPlayerName, @NonNull PlayerName secondPlayerName) {
         return transactionManager.executeInTransactionReturned(
-                () -> createMatchInternal(firstPlayerName, secondPlayerName)
+                () -> createThreeSetMatchInternal(firstPlayerName, secondPlayerName)
+        );
+    }
+
+    public CreatedMatchDto createBestOfFiveMatch(@NonNull PlayerName firstPlayerName, @NonNull PlayerName secondPlayerName) {
+        return transactionManager.executeInTransactionReturned(
+                () -> createFiveSetMatchInternal(firstPlayerName, secondPlayerName)
         );
     }
 
@@ -67,10 +73,17 @@ public class MatchOrchestrator {
         );
     }
 
-    private CreatedMatchDto createMatchInternal(PlayerName firstPlayerName, PlayerName secondPlayerName) {
+    private CreatedMatchDto createThreeSetMatchInternal(PlayerName firstPlayerName, PlayerName secondPlayerName) {
         Player firstPlayer = playerService.getOrCreatePlayer(firstPlayerName);
         Player secondPlayer = playerService.getOrCreatePlayer(secondPlayerName);
-        Match createdMatch = ongoingMatchService.startMatch(firstPlayer, secondPlayer);
+        Match createdMatch = ongoingMatchService.startThreeSetMatch(firstPlayer, secondPlayer);
+        return new CreatedMatchDto(createdMatch.id());
+    }
+
+    private CreatedMatchDto createFiveSetMatchInternal(@NonNull PlayerName firstPlayerName, @NonNull PlayerName secondPlayerName) {
+        Player firstPlayer = playerService.getOrCreatePlayer(firstPlayerName);
+        Player secondPlayer = playerService.getOrCreatePlayer(secondPlayerName);
+        Match createdMatch = ongoingMatchService.startFiveSetMatch(firstPlayer, secondPlayer);
         return new CreatedMatchDto(createdMatch.id());
     }
 

@@ -2,7 +2,12 @@ package com.ephirious.dto.response;
 
 import com.ephirious.model.aggregate.Match;
 import com.ephirious.model.entity.Player;
-import com.ephirious.model.value.match.*;
+import com.ephirious.model.value.score.game.AbstractGameScore;
+import com.ephirious.model.value.score.game.FinalStandardGameScore;
+import com.ephirious.model.value.score.game.StandardGameScore;
+import com.ephirious.model.value.score.game.TieBreakGameScore;
+import com.ephirious.model.value.score.match.AbstractMatchScore;
+import com.ephirious.model.value.score.set.AbstractSetScore;
 
 import java.util.Objects;
 
@@ -21,29 +26,16 @@ public record MatchStatusDto(
     }
 
     private static PlayerPointsMatchDto map(Match match, Player player) {
-        MatchScore matchScore = match.score();
-        SetScore setScore = matchScore.currentSet();
-        GameScore gameScore = setScore.currentGame();
+        AbstractMatchScore matchScore = match.score();
+        AbstractSetScore setScore = matchScore.currentSet();
+        AbstractGameScore<?> gameScore = setScore.currentGame();
         boolean isFirst = Objects.equals(match.firstPlayerId(), player.id());
 
-        int sets = isFirst ? matchScore.firstPlayerSetPoint() : matchScore.secondPlayerSetPoint();
-        int games = isFirst ? setScore.firstPlayerGamePoints() : setScore.secondPlayerGamePoints();
+        int sets = isFirst ? matchScore.firstPlayerScore() : matchScore.secondPlayerScore();
+        int games = isFirst ? setScore.firstPlayerScore() : setScore.secondPlayerScore();
 
-        String pointsAsString = switch (gameScore) {
-            case FinalStandardGame _, StandardGame _ -> isFirst
-                    ? gameScore.firstPlayerPoints()
-                    : gameScore.secondPlayerPoints();
-            case  TieBreakGame _ -> null;
-            default -> throw new IllegalStateException("Unavailable GameScore implementation");
-        };
-
-        Integer pointsAsInt = switch (gameScore) {
-            case TieBreakGame _ -> isFirst
-                    ? Integer.parseInt(gameScore.firstPlayerPoints())
-                    : Integer.parseInt(gameScore.secondPlayerPoints());
-            case FinalStandardGame _, StandardGame _ -> null;
-            default -> throw new IllegalStateException("Unavailable GameScore implementation");
-        };
+        String pointsAsString = getStringPoints(gameScore, isFirst);
+        Integer pointsAsInt = getIntegerPoints(gameScore, isFirst);
 
         return new PlayerPointsMatchDto(
                 player.name().value(),
@@ -52,5 +44,25 @@ public record MatchStatusDto(
                 sets,
                 pointsAsInt
         );
+    }
+
+    private static String getStringPoints(AbstractGameScore<?> gameScore, boolean isFirst) {
+        return switch (gameScore) {
+            case FinalStandardGameScore _, StandardGameScore _-> isFirst
+                    ? (String) gameScore.firstPlayerScore()
+                    : (String) gameScore.secondPlayerScore();
+            case  TieBreakGameScore _ -> null;
+            default -> throw new IllegalStateException("Unavailable GameScore implementation");
+        };
+    }
+
+    private static Integer getIntegerPoints(AbstractGameScore<?> gameScore, boolean isFirst) {
+        return switch (gameScore) {
+            case TieBreakGameScore tie -> isFirst
+                    ? tie.firstPlayerScore()
+                    : tie.secondPlayerScore();
+            case FinalStandardGameScore _, StandardGameScore _ -> null;
+            default -> throw new IllegalStateException("Unavailable GameScore implementation");
+        };
     }
 }
