@@ -2,4 +2,4 @@
 .env.example
 ../currency-exchanger/docker-compose.yml
 .dockerignore
-Dockerfile
+backend/Dockerfile
