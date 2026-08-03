@@ -41,7 +41,7 @@ function initMatchScorePage() {
     $(function () {
         matchUuid = new URLSearchParams(window.location.search).get('uuid');
         if (!matchUuid) {
-            $('#error-message').text('No match ID provided.').show();
+            handleError('No match ID provided.');
             return;
         }
 
@@ -61,11 +61,20 @@ function initMatchScorePage() {
                     var message = xhr.responseJSON
                         ? xhr.responseJSON.message
                         : 'An error occurred.';
-                    $('#error-message').text(message).show();
+                    handleError(message);
                 }
             });
         });
     });
+
+    // Функция для обработки и отображения ошибок
+    function handleError(message) {
+        // Показываем сообщение об ошибке
+        $('#error-message').text(message).show();
+        // Скрываем таблицу со счетом и сообщение о победителе (если оно было)
+        $('.score').hide();
+        $('#winner-message').hide();
+    }
 
     function loadMatch() {
         $.get(HOST + 'matches/' + matchUuid, function (match) {
@@ -74,11 +83,16 @@ function initMatchScorePage() {
             var message = xhr.responseJSON
                 ? xhr.responseJSON.message
                 : 'Failed to load match.';
-            $('#error-message').text(message).show();
+            handleError(message);
         });
     }
 
     function renderMatch(match) {
+        // Если данные получены успешно, показываем таблицу (на случай, если она была скрыта)
+        $('.score').show();
+        // Скрываем сообщение об ошибке, если оно висело
+        $('#error-message').hide();
+
         renderPlayer('#player1', match.firstPlayer);
         renderPlayer('#player2', match.secondPlayer);
 
@@ -93,8 +107,6 @@ function initMatchScorePage() {
             $('.point-btn').show();
             $('#winner-message').hide();
         }
-
-        $('#error-message').hide();
     }
 
     function renderPlayer(prefix, player) {

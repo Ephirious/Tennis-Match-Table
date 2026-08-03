@@ -1,6 +1,7 @@
 package com.ephirious.model.aggregate;
 
 import com.ephirious.exception.domain.ContractViolationException;
+import com.ephirious.exception.domain.SamePlayersException;
 import com.ephirious.exception.domain.UnknowWhichPlayerAwardPointException;
 import com.ephirious.model.value.score.PlayerSide;
 import com.ephirious.model.value.score.match.AbstractMatchScore;
@@ -84,7 +85,7 @@ public class Match {
 
     private void ensureNotSameUuid(UUID firstPlayerId, UUID secondPlayerId) {
         if (Objects.equals(firstPlayerId, secondPlayerId)) {
-            throw new ContractViolationException("The two players have same id");
+            throw new SamePlayersException();
         }
     }
 }
